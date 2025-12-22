@@ -1,0 +1,38 @@
+{
+  "name": "Creonex.viz - Outfit Visual Design",
+  "short_name": "Creonex.viz",
+  "description": "Transform your fabric into stunning outfit concepts with AI-powered visualization",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF8F6",
+  "theme_color": "#3A2C27",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo-light.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["lifestyle", "design", "fashion"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Services",
+      "url": "/#services",
+      "description": "View our outfit visualization services"
+    },
+    {
+      "name": "Contact",
+      "url": "/#contact",
+      "description": "Get in touch with us"
+    }
+  ]
+}
