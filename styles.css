@@ -636,7 +636,7 @@ body.dark-theme .gradient-orb {
 .feature-pill:hover {
     background: rgba(255, 255, 255, 0.1);
     transform: translateY(-2px);
-    border-color: rgba(102, 126, 234, 0.5);
+    border-color: var(--primary-color);
 }
 
 .feature-icon {
@@ -700,12 +700,12 @@ body.dark-theme .gradient-orb {
 .btn-primary {
     background: var(--gradient-primary);
     color: #ffffff;
-    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-primary:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 30px rgba(102, 126, 234, 0.6);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-secondary {
@@ -819,7 +819,7 @@ section {
 
 .service-card {
     position: relative;
-    background: var(--dark-card);
+    background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: var(--spacing-md);
@@ -845,25 +845,39 @@ section {
 
 .service-card:hover {
     transform: translateY(-8px);
-    border-color: rgba(102, 126, 234, 0.5);
+    border-color: var(--primary-color);
     box-shadow: var(--shadow-lg);
 }
 
 .service-card.featured {
-    border-color: rgba(102, 126, 234, 0.5);
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-color: var(--primary-color);
+    background: var(--gradient-primary);
+    background-size: 200% 200%;
+    opacity: 0.95;
+}
+
+.service-card.featured .service-title,
+.service-card.featured .service-features li,
+.service-card.featured .service-icon i {
+    color: #ffffff !important;
+}
+
+.service-card.featured .service-features li::before {
+    color: #ffffff !important;
 }
 
 .featured-badge {
     position: absolute;
     top: var(--spacing-sm);
     right: var(--spacing-sm);
-    background: var(--gradient-primary);
-    padding: 0.375rem 0.75rem;
+    background: var(--accent-color);
+    color: #ffffff;
+    padding: 0.4rem 0.8rem;
     border-radius: var(--radius-sm);
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .service-icon {
@@ -999,7 +1013,7 @@ section {
     flex: 1;
     min-width: 250px;
     max-width: 300px;
-    background: var(--dark-card);
+    background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: var(--spacing-md);
@@ -1011,20 +1025,27 @@ section {
 .process-card::before {
     content: '';
     position: absolute;
-    inset: -2px;
+    inset: 0;
     background: var(--gradient-primary);
     border-radius: var(--radius-lg);
     opacity: 0;
     transition: opacity var(--transition-normal);
-    z-index: -1;
+    z-index: 0;
 }
 
 .process-card:hover::before {
-    opacity: 1;
+    opacity: 0.1;
 }
 
 .process-card:hover {
     transform: translateY(-8px);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-lg);
+}
+
+.process-card>* {
+    position: relative;
+    z-index: 1;
 }
 
 .process-number {
@@ -1040,6 +1061,7 @@ section {
 .process-card h3 {
     font-size: 1.25rem;
     margin-bottom: var(--spacing-xs);
+    color: var(--text-primary);
 }
 
 .process-card p {
@@ -1052,8 +1074,8 @@ section {
 }
 
 .important-note {
-    background: linear-gradient(135deg, rgba(245, 87, 108, 0.1) 0%, rgba(240, 147, 251, 0.1) 100%);
-    border: 1px solid rgba(245, 87, 108, 0.3);
+    background: var(--bg-card);
+    border: 2px solid var(--icon-error);
     border-radius: var(--radius-lg);
     padding: var(--spacing-md);
 }
@@ -1179,17 +1201,19 @@ section {
 }
 
 .brand-tag {
-    background: rgba(102, 126, 234, 0.2);
-    border: 1px solid rgba(102, 126, 234, 0.4);
+    background: var(--bg-card);
+    border: 2px solid var(--primary-color);
     padding: 0.5rem 1rem;
     border-radius: var(--radius-sm);
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
+    color: var(--primary-color);
     transition: all var(--transition-normal);
 }
 
 .brand-tag:hover {
-    background: rgba(102, 126, 234, 0.3);
+    background: var(--primary-color);
+    color: #ffffff;
     transform: translateY(-2px);
 }
 
@@ -1270,7 +1294,7 @@ section {
 
 .collab-card:hover {
     background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(102, 126, 234, 0.5);
+    border-color: var(--primary-color);
     transform: translateY(-5px);
 }
 
@@ -1365,7 +1389,7 @@ section {
 
 .contact-card:hover .contact-card-inner {
     transform: translateY(-10px);
-    border-color: rgba(102, 126, 234, 0.5);
+    border-color: var(--primary-color);
     box-shadow: var(--shadow-glow);
 }
 
@@ -1401,7 +1425,7 @@ section {
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-xs);
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: var(--gradient-accent);
     color: var(--text-primary);
     text-decoration: none;
     padding: 1rem 2rem;
@@ -1409,12 +1433,12 @@ section {
     font-weight: 600;
     font-size: 1.125rem;
     transition: all var(--transition-normal);
-    box-shadow: 0 4px 20px rgba(245, 87, 108, 0.4);
+    box-shadow: var(--shadow-md);
 }
 
 .instagram-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 30px rgba(245, 87, 108, 0.6);
+    box-shadow: var(--shadow-lg);
 }
 
 /* ===================================
@@ -2024,6 +2048,6 @@ section {
 
     /* Tap highlight */
     * {
-        -webkit-tap-highlight-color: rgba(102, 126, 234, 0.2);
+        -webkit-tap-highlight-color: rgba(var(--primary-color), 0.2);
     }
 }
