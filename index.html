@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creonex.viz - From Fabric to Visual Design</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Creonex.viz creates outfit visual design concepts from saree and fabric materials. Transform your fabric into modern, Indo-western, and contemporary outfits with AI-powered visualization.">
+    <meta name="keywords"
+        content="outfit visualization, saree design, fabric design, custom outfit, wedding outfit, Indo-western design">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Creonex.viz - From Fabric to Visual Design">
+    <meta property="og:description"
+        content="Transform your sarees and fabrics into stunning outfit concepts with AI-powered visualization.">
+    <meta property="og:type" content="website">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Intro Animation Screen -->
+    <div class="intro-screen" id="introScreen">
+        <div class="intro-content">
+            <div class="intro-icon">
+                <i data-lucide="hand-wave"></i>
+            </div>
+            <h1 class="intro-text">
+                <span class="intro-line">Hi, this is</span>
+                <span class="intro-brand">Creonex.viz</span>
+            </h1>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="#home" class="logo">
+                    <img src="logo-light.svg" alt="Creonex.viz Logo" class="logo-img logo-light">
+                    <img src="logo-dark.svg" alt="Creonex.viz Logo" class="logo-img logo-dark">
+                </a>
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="nav-right">
+                    <ul class="nav-links" id="navLinks">
+                        <li><a href="#home" class="nav-link">Home</a></li>
+                        <li><a href="#services" class="nav-link">Services</a></li>
+                        <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+                        <li><a href="#brands" class="nav-link">For Brands</a></li>
+                        <li><a href="#contact" class="nav-link cta-link">Let's Collaborate</a></li>
+                    </ul>
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                        <i data-lucide="sun" class="theme-icon sun-icon"></i>
+                        <i data-lucide="moon" class="theme-icon moon-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-background">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="gradient-orb orb-3"></div>
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    From <span class="gradient-text">Fabric</span> to <span class="gradient-text">Visual Design</span>
+                </h1>
+                <p class="hero-description">
+                    I create outfit visual design concepts from saree and fabric materials, showing how a single saree
+                    or fabric can be transformed into modern, Indo-western, and contemporary outfits.
+                </p>
+                <div class="hero-features">
+                    <div class="feature-pill">
+                        <i data-lucide="sparkles" class="feature-icon"></i>
+                        <span>AI-Powered Visualization</span>
+                    </div>
+                    <div class="feature-pill">
+                        <i data-lucide="shirt" class="feature-icon"></i>
+                        <span>No Guesswork</span>
+                    </div>
+                    <div class="feature-pill">
+                        <i data-lucide="palette" class="feature-icon"></i>
+                        <span>Perfect Reference for Tailors</span>
+                    </div>
+                </div>
+                <div class="hero-cta">
+                    <a href="#services" class="btn btn-primary">Explore Services</a>
+                    <a href="#contact" class="btn btn-secondary">Get in Touch</a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span>Scroll to explore</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+    <!-- Customer Services Section -->
+    <section id="services" class="services-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Services</span>
+                <h2 class="section-title">Custom Outfit Visualisation</h2>
+                <p class="section-description">
+                    Transform your fabric into stunning outfit concepts for any occasion
+                </p>
+            </div>
+
+            <div class="services-grid">
+                <!-- Birthday Service -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i data-lucide="cake"></i>
+                    </div>
+                    <h3 class="service-title">Birthday Customisation</h3>
+                    <ul class="service-features">
+                        <li>Outfit concepts using your fabric</li>
+                        <li>Fabric guidance if required</li>
+                        <li>Modern yet wearable designs</li>
+                    </ul>
+                    <div class="service-overlay"></div>
+                </div>
+
+                <!-- Wedding Service -->
+                <div class="service-card featured">
+                    <div class="featured-badge">Most Popular</div>
+                    <div class="service-icon">
+                        <i data-lucide="gem"></i>
+                    </div>
+                    <h3 class="service-title">Wedding Customisation</h3>
+                    <ul class="service-features">
+                        <li>Designs for brides & family members</li>
+                        <li>Outfit planning for different functions</li>
+                        <li>Balance of traditional and modern aesthetics</li>
+                    </ul>
+                    <div class="service-overlay"></div>
+                </div>
+
+                <!-- Events Service -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i data-lucide="party-popper"></i>
+                    </div>
+                    <h3 class="service-title">Events & Special Occasions</h3>
+                    <ul class="service-features">
+                        <li>Festival, party & reception outfit concepts</li>
+                        <li>Designs based on your theme, fabric & occasion</li>
+                        <li>Versatile styling options</li>
+                    </ul>
+                    <div class="service-overlay"></div>
+                </div>
+            </div>
+
+            <!-- What You Get -->
+            <div class="benefits-section">
+                <h3 class="benefits-title">What You Get</h3>
+                <div class="benefits-grid">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i data-lucide="palette"></i>
+                        </div>
+                        <p>Outfit design concepts made from your fabric</p>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i data-lucide="eye"></i>
+                        </div>
+                        <p>Clear visual reference before stitching</p>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i data-lucide="scissors"></i>
+                        </div>
+                        <p>Perfect explanation tool for your tailor</p>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i data-lucide="clock"></i>
+                        </div>
+                        <p>Saves time, fabric, and rework</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How We Work Section -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Process</span>
+                <h2 class="section-title">How We Work</h2>
+            </div>
+
+            <div class="work-process">
+                <div class="process-card">
+                    <div class="process-number">01</div>
+                    <h3>We Design & Visualise</h3>
+                    <p>AI-powered outfit visualization from your fabric</p>
+                </div>
+                <div class="process-arrow">→</div>
+                <div class="process-card">
+                    <div class="process-number">02</div>
+                    <h3>You Receive Visuals</h3>
+                    <p>High-quality design concepts as reference images</p>
+                </div>
+                <div class="process-arrow">→</div>
+                <div class="process-card">
+                    <div class="process-number">03</div>
+                    <h3>Share with Tailor</h3>
+                    <p>Perfect reference for accurate stitching</p>
+                </div>
+            </div>
+
+            <div class="important-note">
+                <div class="note-content">
+                    <h4>Important to Note</h4>
+                    <div class="note-items">
+                        <div class="note-item">
+                            <i data-lucide="x-circle" class="note-icon note-icon-no"></i>
+                            <span>No stitching services</span>
+                        </div>
+                        <div class="note-item">
+                            <i data-lucide="x-circle" class="note-icon note-icon-no"></i>
+                            <span>No garment selling</span>
+                        </div>
+                        <div class="note-item">
+                            <i data-lucide="check-circle" class="note-icon note-icon-yes"></i>
+                            <span>Design & visualization only</span>
+                        </div>
+                    </div>
+                    <p class="note-footer">
+                        <i data-lucide="message-circle" class="note-footer-icon"></i>
+                        Charges are based on individual requirements
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Brand Services Section -->
+    <section id="brands" class="brand-services">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">For Businesses</span>
+                <h2 class="section-title">Brand & Business Services</h2>
+                <p class="section-description">
+                    Exclusive outfit design concepts tailored to your brand identity
+                </p>
+            </div>
+
+            <div class="brand-content">
+                <div class="brand-card">
+                    <div class="brand-card-header">
+                        <div class="brand-icon">
+                            <i data-lucide="briefcase"></i>
+                        </div>
+                        <h3>Brand Outfit Design & Visualisation</h3>
+                    </div>
+                    <div class="brand-card-body">
+                        <div class="ideal-for">
+                            <h4>Ideal For:</h4>
+                            <div class="brand-tags">
+                                <span class="brand-tag">Saree Brands</span>
+                                <span class="brand-tag">Fabric Sellers</span>
+                                <span class="brand-tag">Jewellery Brands</span>
+                                <span class="brand-tag">Boutique Labels</span>
+                            </div>
+                        </div>
+                        <div class="what-we-do">
+                            <h4>What We Do:</h4>
+                            <ul class="brand-features">
+                                <li>Design outfits using your actual sarees or fabrics</li>
+                                <li>Create visuals that match your brand aesthetic</li>
+                                <li>Show multiple styling possibilities from one product</li>
+                                <li>Convert outfit references into visuals using your product</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Collaboration Model -->
+                <div class="collaboration-section">
+                    <div class="collab-header">
+                        <div class="collab-icon">
+                            <i data-lucide="handshake"></i>
+                        </div>
+                        <h3>Paid Collaboration Model</h3>
+                        <p>Partner with fabric sellers, saree brands, and jewellery brands</p>
+                    </div>
+
+                    <div class="collab-grid">
+                        <div class="collab-card">
+                            <h4>How It Works</h4>
+                            <ul class="collab-list">
+                                <li>I design outfit visuals using your products</li>
+                                <li>Visuals featured in my reels and posts</li>
+                                <li>You can repost on your brand page</li>
+                                <li>Direct customer redirects to your page</li>
+                            </ul>
+                        </div>
+
+                        <div class="collab-card">
+                            <h4>Why This Works</h4>
+                            <ul class="collab-list">
+                                <li>Shows product beyond traditional styling</li>
+                                <li>Helps customers visualise modern uses</li>
+                                <li>Increases engagement and clarity</li>
+                                <li>Builds trust before purchase</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact/CTA Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <div class="contact-content">
+                <div class="contact-header">
+                    <h2 class="contact-title">Let's Create Something Amazing</h2>
+                    <p class="contact-description">
+                        Ready to transform your fabric into stunning outfit concepts? Let's discuss your vision.
+                    </p>
+                </div>
+
+                <div class="contact-card">
+                    <div class="contact-card-inner">
+                        <div class="contact-icon">
+                            <i data-lucide="mail"></i>
+                        </div>
+                        <h3>Get in Touch</h3>
+                        <p>DM me on Instagram to discuss collaboration or custom projects</p>
+                        <a href="https://instagram.com/creonex.viz" target="_blank" rel="noopener noreferrer"
+                            class="instagram-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                            </svg>
+                            @creonex.viz
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <img src="logo-light.svg" alt="Creonex.viz Logo" class="footer-logo-img logo-light">
+                        <img src="logo-dark.svg" alt="Creonex.viz Logo" class="footer-logo-img logo-dark">
+                    </div>
+                    <p class="footer-tagline">From fabric to visual design — done right.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#home">Home</a>
+                    <a href="#services">Services</a>
+                    <a href="#how-it-works">How It Works</a>
+                    <a href="#brands">For Brands</a>
+                    <a href="#contact">Contact</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Creonex.viz. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
