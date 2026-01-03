@@ -238,7 +238,12 @@ const ServicesPage = () => {
                             ) : (
                                 <>
                                     {renderServiceSection('Customization Services', 'customization')}
-                                    {renderServiceSection(null, 'general')}
+                                    {renderServiceSection('Other Services We Provide', 'catalog')}
+                                    {renderServiceSection('General Services', 'general')}
+                                    {Object.keys(groupedServices)
+                                        .filter(key => !['customization', 'catalog', 'general'].includes(key))
+                                        .map(key => renderServiceSection(key.charAt(0).toUpperCase() + key.slice(1), key))
+                                    }
                                 </>
                             )}
                         </>
