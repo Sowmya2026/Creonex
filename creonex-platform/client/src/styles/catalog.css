@@ -472,9 +472,9 @@
 
     /* Mobile adjustments for catalog grid density */
     .catalog-grid {
-        grid-template-columns: repeat(2, 1fr);
-        /* Force 2 columns on mobile */
-        gap: 0.75rem;
+        grid-template-columns: 1fr;
+        /* Force 1 column on mobile */
+        gap: 1.5rem;
     }
 
     .catalog-content {
