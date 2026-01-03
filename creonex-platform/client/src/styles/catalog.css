@@ -477,8 +477,13 @@
         gap: 1.5rem;
     }
 
+    .catalog-cover-wrapper {
+        padding-top: 60%;
+        /* Significantly reduced height for mobile */
+    }
+
     .catalog-content {
-        padding: 0.75rem;
+        padding: 0.75rem 1rem;
     }
 
     .catalog-title {
