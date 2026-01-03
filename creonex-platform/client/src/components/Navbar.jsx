@@ -3,7 +3,7 @@ import { Sun, Moon, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import logoLight from '../assets/images/logo-light.svg';
 import logoDark from '../assets/images/logo-dark.svg';
-import '../styles/mobile-menu.css';
+
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
