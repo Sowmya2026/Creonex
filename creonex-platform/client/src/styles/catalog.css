@@ -9,8 +9,8 @@
 
 .catalog-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
     margin-top: 2rem;
 }
 
@@ -53,45 +53,49 @@
 }
 
 .catalog-content {
-    padding: 1.5rem;
+    padding: 1rem;
     flex: 1;
     display: flex;
     flex-direction: column;
 }
 
 .catalog-header {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
 }
 
 .catalog-title {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--text-primary);
     margin: 0;
-    line-height: 1.4;
+    line-height: 1.3;
 }
 
 .catalog-meta {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin: 0.5rem 0 1rem;
-    font-size: 0.9rem;
+    gap: 0.5rem;
+    margin: 0.25rem 0 0.75rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
 }
 
 .catalog-meta-item {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.25rem;
 }
 
 .catalog-description {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: var(--text-muted);
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
     flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .catalog-footer {
@@ -99,33 +103,34 @@
     align-items: center;
     justify-content: space-between;
     margin-top: auto;
-    padding-top: 1rem;
+    padding-top: 0.75rem;
     border-top: 1px solid var(--border-color);
 }
 
 .catalog-price {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: var(--accent-color);
 }
 
 .catalog-currency {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     vertical-align: top;
-    margin-right: 2px;
+    margin-right: 1px;
 }
 
 .btn-buy {
     background: var(--gradient-primary);
     color: white;
-    padding: 0.6rem 1.25rem;
+    padding: 0.5rem 1rem;
     border-radius: var(--radius-sm);
     font-weight: 600;
+    font-size: 0.9rem;
     text-decoration: none;
     transition: all 0.2s;
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.35rem;
     border: none;
     cursor: pointer;
 }
@@ -463,5 +468,35 @@
     .inquiry-item-image-wrapper {
         width: 50px;
         height: 70px;
+    }
+
+    /* Mobile adjustments for catalog grid density */
+    .catalog-grid {
+        grid-template-columns: repeat(2, 1fr);
+        /* Force 2 columns on mobile */
+        gap: 0.75rem;
+    }
+
+    .catalog-content {
+        padding: 0.75rem;
+    }
+
+    .catalog-title {
+        font-size: 0.95rem;
+    }
+
+    .catalog-description {
+        font-size: 0.8rem;
+        -webkit-line-clamp: 2;
+        /* Reduce to 2 lines on mobile */
+    }
+
+    .catalog-price {
+        font-size: 1rem;
+    }
+
+    .btn-buy {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
     }
 }

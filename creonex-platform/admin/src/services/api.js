@@ -6,6 +6,8 @@ const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 });
 
+console.log('Admin API Base URL:', api.defaults.baseURL);
+
 // Add request interceptor to attach Firebase auth token
 api.interceptors.request.use(
     async (config) => {
