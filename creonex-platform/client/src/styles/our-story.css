@@ -1,0 +1,153 @@
+/* ===================================
+   OUR STORY PAGE STYLES
+   =================================== */
+
+.our-story-section {
+    background: var(--bg-secondary);
+    min-height: 100vh;
+    padding: 140px 0 80px;
+    /* Desktop top padding */
+}
+
+.our-story-content {
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    padding: 0 1rem;
+}
+
+/* Typography & Spacing */
+.os-intro {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    margin-bottom: 2rem;
+}
+
+.os-paragraph {
+    margin-bottom: 1.5rem;
+}
+
+.os-paragraph.italic {
+    font-style: italic;
+}
+
+.os-paragraph.bold {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Highlight Box (Pinterest quote) */
+.os-highlight-box {
+    border-left: 4px solid var(--accent-color);
+    background: rgba(139, 111, 71, 0.08);
+    padding: 2rem;
+    margin: 2.5rem 0;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.os-highlight-box p {
+    margin: 0;
+}
+
+.os-highlight-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem !important;
+    font-size: 1.1rem;
+}
+
+/* Subheadings */
+.os-subheading {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    color: var(--text-primary);
+    margin-top: 3rem;
+    margin-bottom: 1.25rem;
+    font-weight: 700;
+}
+
+/* Closing Card */
+.os-closing {
+    text-align: center;
+    margin-top: 4rem;
+    padding: 3rem 2rem;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.os-closing-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.os-final-line {
+    color: var(--accent-color);
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+/* ===================================
+   MOBILE RESPONSIVE
+   =================================== */
+
+@media (max-width: 768px) {
+    .our-story-section {
+        padding: 110px 0 60px;
+        /* Reduced top padding for mobile */
+    }
+
+    .section-title {
+        font-size: 2rem;
+        /* Smaller title */
+    }
+
+    .our-story-content {
+        font-size: 1rem;
+        padding: 0 1.25rem;
+    }
+
+    .os-intro {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .os-subheading {
+        font-size: 1.4rem;
+        margin-top: 2.5rem;
+    }
+
+    .os-highlight-box {
+        padding: 1.5rem;
+        margin: 2rem 0;
+        border-left-width: 3px;
+    }
+
+    .os-closing {
+        margin-top: 3rem;
+        padding: 2rem 1.5rem;
+    }
+
+    .os-closing-text {
+        font-size: 1.15rem;
+    }
+
+    .our-story-section .section-header {
+        margin-bottom: 1.5rem;
+        /* Significantly reduced from 4rem */
+    }
+
+    .os-final-line {
+        font-size: 0.95rem;
+        letter-spacing: 1px;
+    }
+}

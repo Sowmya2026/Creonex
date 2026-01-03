@@ -1,0 +1,17 @@
+/* Responsive Page Padding Utility */
+.page-padding {
+    padding: 120px 0 80px;
+    min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+    .page-padding {
+        padding: 130px 0 60px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-padding {
+        padding: 120px 0 40px;
+    }
+}

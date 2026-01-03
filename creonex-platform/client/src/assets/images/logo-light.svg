@@ -1,0 +1,17 @@
+<svg width="220" height="50" viewBox="0 0 220 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- CN Logo -->
+  <g transform="translate(5, 3)">
+    <!-- C - Circle with opening at bottom-right -->
+    <path d="M 40 34 A 22 22 0 1 1 40 10" stroke="#3A2C27" stroke-width="5" fill="none" stroke-linecap="round"/>
+    
+    <!-- N Letter - CENTERED inside the circle -->
+    <g transform="translate(15, 13)">
+      <line x1="0" y1="0" x2="0" y2="18" stroke="#3A2C27" stroke-width="5" stroke-linecap="round"/>
+      <line x1="0" y1="0" x2="12" y2="18" stroke="#3A2C27" stroke-width="5" stroke-linecap="round"/>
+      <line x1="12" y1="0" x2="12" y2="18" stroke="#3A2C27" stroke-width="5" stroke-linecap="round"/>
+    </g>
+  </g>
+  
+  <!-- CREONEX VIZ Text -->
+  <text x="58" y="32" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" fill="#3A2C27" letter-spacing="2.5">CREONEX VIZ</text>
+</svg>

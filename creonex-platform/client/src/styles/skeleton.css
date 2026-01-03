@@ -1,0 +1,96 @@
+/* Skeleton Loading Styles */
+.skeleton {
+    background: #e0e0e0;
+    border-radius: 4px;
+    animation: skeleton-loading 1.5s infinite;
+}
+
+.skeleton-card {
+    border-color: #eee !important;
+    background: #fff;
+}
+
+.skeleton-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-title {
+    height: 1.8rem;
+    width: 70%;
+    margin-bottom: 1rem;
+}
+
+.skeleton-desc {
+    width: 100%;
+}
+
+.skeleton-desc-short {
+    width: 60%;
+    margin-bottom: 1.5rem;
+}
+
+.skeleton-list-item {
+    width: 90%;
+    height: 0.8rem;
+    margin-bottom: 0.8rem;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-color: #f0f0f0;
+    }
+
+    50% {
+        background-color: #e0e0e0;
+    }
+
+    100% {
+        background-color: #f0f0f0;
+    }
+}
+
+/* Dark Theme Support */
+body.dark-theme .skeleton {
+    background: #2a2a35;
+}
+
+body.dark-theme .skeleton-card {
+    border-color: #333 !important;
+    background: #1a1a20;
+}
+
+body.dark-theme .skeleton-icon {
+    background: #2a2a35;
+}
+
+body.dark-theme .skeleton-title,
+body.dark-theme .skeleton-desc,
+body.dark-theme .skeleton-list-item {
+    background: #2a2a35;
+}
+
+@keyframes skeleton-loading-dark {
+    0% {
+        background-color: #2a2a35;
+    }
+
+    50% {
+        background-color: #353545;
+    }
+
+    100% {
+        background-color: #2a2a35;
+    }
+}
+
+body.dark-theme .skeleton {
+    animation-name: skeleton-loading-dark;
+}

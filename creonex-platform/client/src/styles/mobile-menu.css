@@ -1,0 +1,432 @@
+/* ===================================
+   MOBILE NAVIGATION MENU - COMPLETE STYLES
+   =================================== */
+
+/* Mobile Menu Toggle Button (Hamburger) */
+.mobile-menu-btn {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 1001;
+}
+
+.mobile-menu-btn span {
+    width: 28px;
+    height: 3px;
+    background: var(--text-primary);
+    border-radius: 3px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+}
+
+/* Hamburger Animation to X */
+.mobile-menu-btn.active span:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+
+.mobile-menu-btn.active span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.mobile-menu-btn.active span:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+/* Show hamburger on mobile */
+@media (max-width: 992px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+}
+
+/* ===================================
+   MOBILE MENU BACKDROP
+   =================================== */
+
+.mobile-menu-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ===================================
+   MOBILE MENU MODAL
+   =================================== */
+
+.mobile-menu-modal {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    bottom: 0;
+    width: 75%;
+    max-width: 350px;
+    background: var(--bg-secondary);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.mobile-menu-modal.active {
+    right: 0;
+}
+
+/* ===================================
+   MOBILE MENU HEADER
+   =================================== */
+
+.mobile-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.mobile-menu-logo {
+    height: 36px;
+    display: flex;
+    align-items: center;
+}
+
+.mobile-menu-logo .logo-img {
+    height: 36px;
+    width: auto;
+}
+
+/* Logo theme switching */
+body:not(.dark-theme) .mobile-menu-logo .logo-dark {
+    display: none;
+}
+
+body.dark-theme .mobile-menu-logo .logo-light {
+    display: none;
+}
+
+.mobile-menu-close {
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.mobile-menu-close:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-color);
+}
+
+/* ===================================
+   MOBILE MENU CONTENT (Navigation)
+   =================================== */
+
+.mobile-menu-content {
+    flex: 1;
+    padding: 2rem 0;
+    overflow-y: auto;
+}
+
+.mobile-nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mobile-nav-links li {
+    animation: slideInRight 0.4s ease-out backwards;
+}
+
+/* Staggered animation for each item */
+.mobile-nav-links li:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.mobile-nav-links li:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.mobile-nav-links li:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.mobile-nav-links li:nth-child(4) {
+    animation-delay: 0.25s;
+}
+
+.mobile-nav-links li:nth-child(5) {
+    animation-delay: 0.3s;
+}
+
+.mobile-nav-links li:nth-child(6) {
+    animation-delay: 0.35s;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Mobile Navigation Links */
+.mobile-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.125rem 1.5rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 1.125rem;
+    font-weight: 500;
+    transition: all var(--transition-normal);
+    position: relative;
+    border-left: 3px solid transparent;
+}
+
+/* Active State - The ONLY highlight */
+/* Remove Hover Effects STRICTLY to avoid confusion/sticky states */
+/* Remove Hover Effects STRICTLY to avoid confusion/sticky states */
+.mobile-nav-link {
+    -webkit-tap-highlight-color: transparent;
+    /* Remove mobile tap highlight */
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link:focus,
+.mobile-nav-link:active,
+.mobile-nav-link:visited {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-left-color: transparent !important;
+    transform: none !important;
+    box-shadow: none !important;
+    padding-left: 1.5rem !important;
+    /* Force default padding */
+    color: var(--text-primary) !important;
+}
+
+/* Re-apply Active State styles with !important to ensure they win over everything */
+.mobile-nav-link.active {
+    background: var(--bg-card-hover) !important;
+    border-left-color: var(--accent-color) !important;
+    padding-left: 2rem !important;
+}
+
+.mobile-nav-link.active .mobile-nav-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+}
+
+.mobile-nav-number {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    font-family: 'Courier New', monospace;
+    min-width: 30px;
+}
+
+.mobile-nav-text {
+    flex: 1;
+}
+
+/* CTA Link (Let's Collaborate) */
+.mobile-nav-cta {
+    margin: 1rem 1.5rem;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid transparent !important;
+    padding-left: 1.5rem !important;
+}
+
+.mobile-nav-cta .mobile-nav-number,
+.mobile-nav-cta .mobile-nav-text {
+    color: #ffffff !important;
+}
+
+.mobile-nav-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    background: var(--gradient-primary);
+}
+
+.mobile-nav-cta .mobile-nav-text {
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* ===================================
+   MOBILE MENU FOOTER
+   =================================== */
+
+.mobile-menu-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-card);
+    margin-top: auto;
+}
+
+.mobile-menu-tagline {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin: 0;
+    font-style: italic;
+    letter-spacing: 0.5px;
+}
+
+/* ===================================
+   MOBILE RESPONSIVE IMPROVEMENTS
+   =================================== */
+
+/* Full width on smaller screens */
+@media (max-width: 768px) {
+    .mobile-menu-modal {
+        width: 85%;
+    }
+
+    .mobile-menu-header {
+        padding: 1.25rem;
+    }
+
+    .mobile-menu-logo .logo-img {
+        height: 32px;
+    }
+
+    .mobile-nav-link {
+        font-size: 1.05rem;
+        padding: 1rem 1.25rem;
+    }
+
+    .mobile-nav-cta {
+        margin: 1rem 1.25rem;
+    }
+
+    .mobile-menu-footer {
+        padding: 1.25rem;
+    }
+
+    .mobile-menu-tagline {
+        font-size: 0.85rem;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .mobile-menu-modal {
+        width: 85%;
+        max-width: 100%;
+    }
+
+    .mobile-menu-header {
+        padding: 1rem;
+    }
+
+    .mobile-menu-logo .logo-img {
+        height: 28px;
+    }
+
+    .mobile-menu-close {
+        width: 36px;
+        height: 36px;
+    }
+
+    .mobile-nav-link {
+        font-size: 1rem;
+        padding: 0.875rem 1rem;
+        gap: 1rem;
+    }
+
+    .mobile-nav-number {
+        font-size: 0.8rem;
+        min-width: 25px;
+    }
+
+    .mobile-nav-cta {
+        margin: 0.875rem 1rem;
+    }
+
+    .mobile-menu-footer {
+        padding: 1rem;
+    }
+
+    .mobile-menu-tagline {
+        font-size: 0.8rem;
+    }
+}
+
+/* ===================================
+   SCROLL PREVENTION
+   =================================== */
+
+/* Prevent body scroll when mobile menu is open */
+body.mobile-menu-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
+
+/* ===================================
+   DARK THEME ENHANCEMENTS
+   =================================== */
+
+body.dark-theme .mobile-menu-modal {
+    background: var(--bg-secondary);
+}
+
+body.dark-theme .mobile-menu-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .mobile-menu-footer {
+    border-top-color: rgba(255, 255, 255, 0.1);
+    background: var(--bg-card);
+}
+
+body.dark-theme .mobile-nav-link:hover {
+    background: transparent !important;
+}
+
+body.dark-theme .mobile-menu-close {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .mobile-menu-close:hover {
+    border-color: var(--primary-light);
+    background: rgba(255, 255, 255, 0.05);
+}
