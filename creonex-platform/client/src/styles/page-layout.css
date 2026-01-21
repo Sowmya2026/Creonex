@@ -6,12 +6,14 @@
 
 @media (max-width: 768px) {
     .page-padding {
-        padding: 130px 0 60px;
+        padding: 78px 0 60px;
+        /* Reduced by 5px from 80px */
     }
 }
 
 @media (max-width: 480px) {
     .page-padding {
-        padding: 120px 0 40px;
+        padding: 73px 0 40px;
+        /* Reduced by 5px from 75px */
     }
 }

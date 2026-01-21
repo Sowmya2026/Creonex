@@ -5,7 +5,6 @@
 /* Contact Section */
 .contact-section {
     min-height: 100vh;
-    padding: 120px 0 80px;
     background: var(--bg-primary);
 }
 
@@ -21,21 +20,7 @@
     margin-bottom: 4rem;
 }
 
-.contact-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-}
 
-.contact-description {
-    font-size: 1.25rem;
-    color: var(--text-secondary);
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 1.6;
-}
 
 /* Contact Grid - Form + Cards */
 .contact-grid {
@@ -43,6 +28,7 @@
     grid-template-columns: 1fr;
     gap: 3rem;
     max-width: 1000px;
+    width: 100%;
     margin: 0 auto;
 }
 
@@ -178,6 +164,8 @@
     flex-direction: column;
     gap: 1.25rem;
     flex: 1;
+    align-items: center;
+    text-align: center;
 }
 
 /* Contact Card Icons */
@@ -265,13 +253,29 @@
         margin-bottom: 3rem;
     }
 
-    .contact-title {
-        font-size: 2.5rem;
+    .contact-grid {
+        display: block;
+        gap: 2rem;
+        width: 100%;
+        padding: 0;
     }
 
-    .contact-grid {
-        grid-template-columns: 1fr;
-        gap: 2rem;
+    .contact-form-container {
+        margin-bottom: 2rem;
+        max-width: 100%;
+    }
+
+    .contact-card {
+        max-width: 100%;
+        margin-bottom: 1.5rem;
+    }
+
+    .contact-cards-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        /* Handled by margin */
+        width: 100%;
     }
 }
 
@@ -296,6 +300,10 @@
 
     .submit-btn {
         padding: 1rem;
+    }
+
+    .contact-card {
+        padding: 1.5rem;
     }
 }
 

@@ -73,6 +73,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/notes', notesRoutes);
 app.use('/api/catalogs', catalogRoutes);
 app.use('/api/catalog-inquiries', catalogInquiryRoutes);
+app.use('/api/invoices', require('./routes/invoiceRoutes'));
 
 
 // Error handling middleware

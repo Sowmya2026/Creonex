@@ -5,7 +5,6 @@
 /* Brand Services Section */
 .brand-services {
     min-height: 100vh;
-    padding: 120px 0 80px;
     background: var(--bg-primary);
 }
 
@@ -13,22 +12,6 @@
 .brand-services .section-header {
     text-align: center;
     margin-bottom: 4rem;
-}
-
-.brand-services .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 5vw, 3rem);
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-}
-
-.brand-services .section-description {
-    font-size: 1.125rem;
-    color: var(--text-secondary);
-    max-width: 700px;
-    margin: 0 auto;
-    line-height: 1.6;
 }
 
 /* ===================================
@@ -288,9 +271,7 @@
 
 /* Tablets */
 @media (max-width: 1024px) {
-    .brand-services {
-        padding: 100px 0 60px;
-    }
+
 
     .collab-grid {
         gap: 1.5rem;
@@ -303,17 +284,7 @@
 
 /* Mobile */
 @media (max-width: 768px) {
-    .brand-services {
-        padding: 130px 0 60px;
-    }
 
-    .brand-services .section-title {
-        font-size: 2rem;
-    }
-
-    .brand-services .section-description {
-        font-size: 1rem;
-    }
 
     .brand-card-header {
         padding: 2rem 1.5rem;
@@ -375,9 +346,7 @@
 
 /* Small Mobile */
 @media (max-width: 480px) {
-    .brand-services {
-        padding: 120px 0 40px;
-    }
+
 
     .brand-services .section-title {
         font-size: 1.75rem;

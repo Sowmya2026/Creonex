@@ -58,8 +58,8 @@ const ContactPage = () => {
             <div className="container">
                 <div className="contact-content">
                     <div className="contact-header">
-                        <h2 className="contact-title">Let's Create Something Amazing</h2>
-                        <p className="contact-description">
+                        <h2 className="section-title">Let's Create Something Amazing</h2>
+                        <p className="section-description">
                             Ready to transform your fabric into stunning outfit concepts? Let's discuss your vision.
                         </p>
                     </div>

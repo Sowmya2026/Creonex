@@ -14,7 +14,8 @@ import {
     Menu,
     X,
     StickyNote,
-    BookOpen
+    BookOpen,
+    FileText
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -89,6 +90,7 @@ const Sidebar = () => {
         { icon: StickyNote, label: 'Notes', path: '/notes' },
         { icon: BookOpen, label: 'Catalogs', path: '/catalogs' },
         { icon: MessageSquare, label: 'Cat. Inquiries', path: '/catalog-inquiries' },
+        { icon: FileText, label: 'Invoices', path: '/invoices' },
         { icon: Settings, label: 'Settings', path: '/settings' }
     ];
 

@@ -23,7 +23,7 @@ const ClientPage = () => {
                 initialType={bookingType}
             />
 
-            <section id="collabs" className="brand-services">
+            <section id="collabs" className="brand-services page-padding">
                 <div className="container">
                     <ScrollReveal animation="fade-up">
                         <div className="section-header">

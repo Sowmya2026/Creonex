@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sun, Moon, X } from 'lucide-react';
+import { Sun, Moon, X, Home, BookOpen, Briefcase, Users, Building2, FolderOpen, BookMarked, Mail } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import logoLight from '../assets/images/logo-light.svg';
 import logoDark from '../assets/images/logo-dark.svg';
@@ -88,7 +88,7 @@ const Navbar = () => {
                             </ul>
 
                             {/* Theme Toggle Button */}
-                            <button className="theme-toggle" id="themeToggle" aria-label="Toggle theme" onClick={toggleTheme}>
+                            <button className="theme-toggle desktop-only" id="themeToggle" aria-label="Toggle theme" onClick={toggleTheme}>
                                 <Sun className="theme-icon sun-icon" />
                                 <Moon className="theme-icon moon-icon" />
                             </button>
@@ -130,7 +130,7 @@ const Navbar = () => {
                         onClick={closeMobileMenu}
                         aria-label="Close menu"
                     >
-                        <X size={24} />
+                        <X size={18} />
                     </button>
                 </div>
 
@@ -138,49 +138,49 @@ const Navbar = () => {
                     <ul className="mobile-nav-links">
                         <li>
                             <Link to="/" className={`mobile-nav-link ${isActive('/')}`} onClick={closeMobileMenu}>
-                                <span className="mobile-nav-number">01</span>
+                                <Home className="mobile-nav-icon" size={16} />
                                 <span className="mobile-nav-text">Home</span>
                             </Link>
                         </li>
                         <li>
                             <Link to="/our-story" className={`mobile-nav-link ${isActive('/our-story')}`} onClick={closeMobileMenu}>
-                                <span className="mobile-nav-number">02</span>
+                                <BookOpen className="mobile-nav-icon" size={16} />
                                 <span className="mobile-nav-text">Our Story</span>
                             </Link>
                         </li>
                         <li>
                             <Link to="/services" className={`mobile-nav-link ${isActive('/services')}`} onClick={closeMobileMenu}>
-                                <span className="mobile-nav-number">03</span>
+                                <Briefcase className="mobile-nav-icon" size={16} />
                                 <span className="mobile-nav-text">Services</span>
                             </Link>
                         </li>
                         <li>
                             <Link to="/portfolio" className={`mobile-nav-link ${isActive('/portfolio')}`} onClick={closeMobileMenu}>
-                                <span className="mobile-nav-number">04</span>
+                                <FolderOpen className="mobile-nav-icon" size={16} />
                                 <span className="mobile-nav-text">Portfolio</span>
                             </Link>
                         </li>
                         <li>
                             <Link to="/catalogs" className={`mobile-nav-link ${isActive('/catalogs')}`} onClick={closeMobileMenu}>
-                                <span className="mobile-nav-number">05</span>
+                                <BookMarked className="mobile-nav-icon" size={16} />
                                 <span className="mobile-nav-text">Catalogs</span>
                             </Link>
                         </li>
                         <li>
                             <Link to="/brands" className={`mobile-nav-link ${isActive('/brands')}`} onClick={closeMobileMenu}>
-                                <span className="mobile-nav-number">06</span>
+                                <Building2 className="mobile-nav-icon" size={16} />
                                 <span className="mobile-nav-text">For Brands</span>
                             </Link>
                         </li>
                         <li>
                             <Link to="/clients" className={`mobile-nav-link ${isActive('/clients')}`} onClick={closeMobileMenu}>
-                                <span className="mobile-nav-number">07</span>
+                                <Users className="mobile-nav-icon" size={16} />
                                 <span className="mobile-nav-text">For Collabs</span>
                             </Link>
                         </li>
                         <li>
                             <Link to="/contact" className={`mobile-nav-link mobile-nav-cta ${isActive('/contact')}`} onClick={closeMobileMenu}>
-                                <span className="mobile-nav-number">08</span>
+                                <Mail className="mobile-nav-icon" size={16} />
                                 <span className="mobile-nav-text">Let's Contact</span>
                             </Link>
                         </li>
@@ -188,6 +188,12 @@ const Navbar = () => {
                 </nav>
 
                 <div className="mobile-menu-footer">
+                    {/* Theme Toggle in Mobile Menu */}
+                    <button className="mobile-theme-toggle" aria-label="Toggle theme" onClick={toggleTheme}>
+                        <Sun className="theme-icon sun-icon" />
+                        <Moon className="theme-icon moon-icon" />
+                        <span className="theme-toggle-text">Toggle Theme</span>
+                    </button>
                     <p className="mobile-menu-tagline">From Fabric to Visual Design</p>
                 </div>
             </div>

@@ -3,7 +3,7 @@ import '../styles/our-story.css';
 
 const OurStoryPage = () => {
     return (
-        <section className="our-story-section" id="our-story">
+        <section className="our-story-section page-padding" id="our-story">
             <div className="container">
                 <ScrollReveal animation="fade-up">
                     <div className="section-header">

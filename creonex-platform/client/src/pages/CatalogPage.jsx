@@ -71,7 +71,7 @@ const CatalogPage = () => {
     };
 
     return (
-        <div className="catalog-section" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
+        <div className="catalog-section page-padding">
             <div className="container">
                 <ScrollReveal animation="fade-up">
                     <div className="section-header">

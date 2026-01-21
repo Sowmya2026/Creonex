@@ -212,7 +212,7 @@ const ServicesPage = () => {
             <section className="services-section page-padding">
                 <div className="container">
                     <div className="section-header">
-                        <h2 className="section-title">Custom Outfit Visualisation & Other Services</h2>
+                        <h2 className="section-title">Our Services</h2>
                         <p className="section-description">
                             Transform your fabric into stunning outfit concepts and create professional product catalogs for any
                             occasion

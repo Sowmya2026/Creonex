@@ -275,6 +275,7 @@ const ServicesPage = () => {
                                     <option value="customization">Customization</option>
                                     <option value="catalog">Other Services we provide</option>
                                     <option value="brand">Brand Services</option>
+                                    <option value="product">Product Services</option>
                                     <option value="general">General</option>
                                 </select>
                             </div>
@@ -530,7 +531,11 @@ const ServicesPage = () => {
                                         fontSize: '0.75rem',
                                         textTransform: 'capitalize'
                                     }}>
-                                        {service.category === 'catalog' ? 'Other Services we provide' : service.category}
+                                        {service.category === 'catalog'
+                                            ? 'Other Services we provide'
+                                            : service.category === 'product'
+                                                ? 'Product Services'
+                                                : service.category}
                                     </span>
                                 </div>
                                 <p style={{ color: '#666', marginBottom: '0.75rem' }}>{service.description}</p>

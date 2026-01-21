@@ -21,7 +21,7 @@ const BrandPage = () => {
                 initialType={bookingType}
             />
 
-            <section id="brands" className="brand-services">
+            <section id="brands" className="brand-services page-padding">
                 <div className="container">
                     <ScrollReveal animation="fade-up">
                         <div className="section-header">

@@ -403,7 +403,7 @@
     .portfolio-grid {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 1.25rem;
-        padding: 0 0.5rem 3rem;
+        padding: 0 0 3rem;
     }
 
     .portfolio-card-image {

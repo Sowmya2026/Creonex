@@ -5,7 +5,6 @@
 /* Services Section */
 .services-section {
     min-height: 100vh;
-    padding: 120px 0 80px;
     background: var(--bg-primary);
 }
 
@@ -26,21 +25,7 @@
     margin-bottom: 1rem;
 }
 
-.section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 5vw, 3rem);
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-}
 
-.section-description {
-    font-size: 1.125rem;
-    color: var(--text-secondary);
-    max-width: 700px;
-    margin: 0 auto;
-    line-height: 1.6;
-}
 
 /* ===================================
    SERVICES GRID - 3 COLUMNS
@@ -222,29 +207,18 @@
 
 /* Mobile - 1 column for everything */
 @media (max-width: 768px) {
-    .services-section {
-        padding: 130px 0 60px;
-    }
+
 
     .section-header {
         margin-bottom: 3rem;
     }
 
-    .section-title {
-        font-size: 2rem;
-    }
-
-    .section-description {
-        font-size: 1rem;
-    }
-
     .services-grid {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
     }
 
     .service-card {
-        padding: 2rem 1.5rem;
+        padding: 1.5rem;
     }
 
     .service-title {
@@ -261,26 +235,51 @@
 
     .benefits-grid {
         grid-template-columns: 1fr;
-        gap: 1.25rem;
+        gap: 1rem;
     }
 
     .benefit-item {
-        padding: 1.5rem 1rem;
+        padding: 0.75rem 0;
+        background: transparent;
+        border: none;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        box-shadow: none;
+    }
+
+    .benefit-item:hover {
+        transform: none;
+        box-shadow: none;
+        border: none;
+    }
+
+    .benefit-icon {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        background: transparent;
+        color: var(--accent-color);
+        margin: 0 1rem 0 0;
+        box-shadow: none;
+    }
+
+    .benefit-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .benefit-item p {
+        font-size: 1rem;
+        color: var(--text-primary);
     }
 }
 
-/* Small Mobile */
 @media (max-width: 480px) {
-    .services-section {
-        padding: 120px 0 40px;
-    }
 
-    .section-title {
-        font-size: 1.75rem;
-    }
 
     .service-card {
-        padding: 1.5rem 1.25rem;
+        padding: 1.25rem;
     }
 
     .service-icon {
