@@ -436,14 +436,14 @@ body.dark-theme .navbar.scrolled {
     align-items: center;
 
     /* Container Styling: Floating Glass Pill */
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(245, 241, 237, 0.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     padding: 0.3rem 0.5rem;
     border-radius: 50px;
     /* Full pill shape */
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(139, 111, 71, 0.15);
+    box-shadow: 0 4px 12px rgba(58, 44, 39, 0.08);
     transition: all var(--transition-normal);
 }
 
@@ -492,29 +492,29 @@ body.dark-theme .nav-link.active {
 
 /* CTA Link Specifics - Pull it out of the container visually if needed, but styling here overrides */
 .cta-link {
-    background: var(--text-primary) !important;
-    color: var(--bg-primary) !important;
+    background: #3A2C27 !important;
+    color: #ffffff !important;
     padding: 0.6rem 1.4rem !important;
     margin-left: 0.5rem;
     border-radius: 50px !important;
     font-weight: 600;
     font-size: 0.85rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(58, 44, 39, 0.3);
 }
 
 .cta-link:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-    background: var(--accent-color) !important;
+    box-shadow: 0 6px 16px rgba(58, 44, 39, 0.4);
+    background: #8B6F47 !important;
 }
 
 body.dark-theme .cta-link {
-    background: #ffffff !important;
-    color: #000000 !important;
+    background: #8B6F47 !important;
+    color: #ffffff !important;
 }
 
 body.dark-theme .cta-link:hover {
-    background: var(--accent-color) !important;
+    background: #A68A5E !important;
     color: #ffffff !important;
 }
 
