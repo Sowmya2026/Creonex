@@ -18,6 +18,7 @@ const InquiriesPage = () => {
             // Filter out brands and collaborations
             const generalInquiries = allInquiries.filter(inquiry =>
                 inquiry.type !== 'collaboration' &&
+                !inquiry.company && // Exclude if company exists
                 !inquiry.subject?.toLowerCase().includes('brand') &&
                 !inquiry.subject?.toLowerCase().includes('collab')
             );

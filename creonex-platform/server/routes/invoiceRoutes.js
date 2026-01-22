@@ -6,6 +6,7 @@ const invoiceController = require('../controllers/invoiceController');
 router.post('/', invoiceController.createInvoice);
 router.get('/', invoiceController.getInvoices);
 router.get('/:id', invoiceController.getInvoice);
+router.delete('/:id', invoiceController.deleteInvoice);
 router.get('/:id/pdf', invoiceController.generatePDF);
 
 module.exports = router;

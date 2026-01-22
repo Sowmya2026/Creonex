@@ -19,6 +19,7 @@ const CatalogInquiriesPage = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
+    const [activeTab, setActiveTab] = useState('All');
 
     useEffect(() => {
         fetchInquiries();
@@ -56,27 +57,60 @@ const CatalogInquiriesPage = () => {
             setInquiries(inquiries.map(item =>
                 item.id === id ? { ...item, status: newStatus } : item
             ));
+            showSuccess('Status updated successfully');
         } catch (error) {
             console.error('Update status error:', error);
             showError('Failed to update status');
         }
     };
 
-    const filteredInquiries = inquiries.filter(item =>
+    const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+
+        try {
+            const date = new Date(dateString);
+            // Check if date is valid
+            if (isNaN(date.getTime())) {
+                return 'Invalid Date';
+            }
+
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch (error) {
+            console.error('Date formatting error:', error);
+            return 'Invalid Date';
+        }
+    };
+
+    // Filter by search term
+    const searchFilteredInquiries = inquiries.filter(item =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.catalogTitle?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+    // Filter by active tab
+    const filteredInquiries = activeTab === 'All'
+        ? searchFilteredInquiries
+        : searchFilteredInquiries.filter(item =>
+            (item.status || 'New') === activeTab
+        );
+
+    // Count inquiries by status
+    const statusCounts = {
+        All: inquiries.length,
+        New: inquiries.filter(i => (i.status || 'New') === 'New').length,
+        Contacted: inquiries.filter(i => i.status === 'Contacted').length,
+        Sold: inquiries.filter(i => i.status === 'Sold').length,
+        Closed: inquiries.filter(i => i.status === 'Closed').length
     };
+
+    const tabs = ['All', 'New', 'Contacted', 'Sold', 'Closed'];
 
     return (
         <div className="page-container">
@@ -85,6 +119,20 @@ const CatalogInquiriesPage = () => {
                     <h1 className="page-title">Catalog Inquiries</h1>
                     <p className="page-subtitle">Track interest in your design catalogs</p>
                 </div>
+            </div>
+
+            {/* Tabs */}
+            <div className="tabs-container">
+                {tabs.map(tab => (
+                    <button
+                        key={tab}
+                        className={`tab-button ${activeTab === tab ? 'active' : ''}`}
+                        onClick={() => setActiveTab(tab)}
+                    >
+                        {tab}
+                        <span className="tab-count">{statusCounts[tab]}</span>
+                    </button>
+                ))}
             </div>
 
             <div className="filters-bar">
@@ -106,7 +154,11 @@ const CatalogInquiriesPage = () => {
                 <div className="empty-state">
                     <MessageCircle size={48} />
                     <h3>No inquiries found</h3>
-                    <p>When clients express interest in catalogs, they will appear here.</p>
+                    <p>
+                        {searchTerm
+                            ? 'No inquiries match your search criteria.'
+                            : `No ${activeTab.toLowerCase()} inquiries at the moment.`}
+                    </p>
                 </div>
             ) : (
                 <div className="inquiries-list">
@@ -133,7 +185,7 @@ const CatalogInquiriesPage = () => {
                                         <Calendar size={14} /> {formatDate(item.createdAt)}
                                     </span>
                                     <select
-                                        className={`status-select ${item.status?.toLowerCase()}`}
+                                        className={`status-select ${(item.status || 'New').toLowerCase()}`}
                                         value={item.status || 'New'}
                                         onChange={(e) => updateStatus(item.id, e.target.value)}
                                     >
@@ -195,3 +247,4 @@ const CatalogInquiriesPage = () => {
 };
 
 export default CatalogInquiriesPage;
+

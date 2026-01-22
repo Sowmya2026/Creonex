@@ -81,16 +81,16 @@ const Sidebar = () => {
 
     const menuItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-        { icon: BarChart3, label: 'Analytics', path: '/analytics' },
         { icon: Package, label: 'Services', path: '/services' },
-        { icon: Image, label: 'Portfolio', path: '/portfolio' },
-        { icon: Users, label: 'Visitors', path: '/visitors' },
-        { icon: MessageSquare, label: 'Inquiries', path: '/inquiries', badge: notifications },
+        { icon: MessageSquare, label: 'Ser.Inquiries', path: '/inquiries', badge: notifications },
         { icon: Briefcase, label: 'Brands & Collabs', path: '/brands-collabs' },
-        { icon: StickyNote, label: 'Notes', path: '/notes' },
         { icon: BookOpen, label: 'Catalogs', path: '/catalogs' },
         { icon: MessageSquare, label: 'Cat. Inquiries', path: '/catalog-inquiries' },
+        { icon: Image, label: 'Portfolio', path: '/portfolio' },
+        { icon: StickyNote, label: 'Notes', path: '/notes' },
         { icon: FileText, label: 'Invoices', path: '/invoices' },
+        { icon: Users, label: 'Visitors', path: '/visitors' },
+        { icon: BarChart3, label: 'Analytics', path: '/analytics' },
         { icon: Settings, label: 'Settings', path: '/settings' }
     ];
 

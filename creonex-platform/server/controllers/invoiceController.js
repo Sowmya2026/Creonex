@@ -101,6 +101,17 @@ exports.getInvoice = async (req, res) => {
     }
 };
 
+// Delete Invoice
+exports.deleteInvoice = async (req, res) => {
+    try {
+        await db.collection('invoices').doc(req.params.id).delete();
+        res.status(200).json({ message: 'Invoice deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting invoice:', error);
+        res.status(500).json({ message: 'Error deleting invoice', error: error.message });
+    }
+};
+
 // Generate PDF - Matching uploaded format exactly
 exports.generatePDF = async (req, res) => {
     try {

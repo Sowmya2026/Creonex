@@ -61,7 +61,8 @@ body {
 /* Mobile Menu Toggle */
 .mobile-menu-toggle {
     position: fixed;
-    top: 1rem;
+    top: 0.5rem;
+    /* Centered in 60px header (8px top) */
     left: 1rem;
     z-index: 101;
     background: var(--primary-color);
@@ -692,4 +693,49 @@ body.sidebar-collapsed .main-content {
 
 .spin {
     animation: spin 1s linear infinite;
+}
+
+/* ==============================================
+   MOBILE GENERAL RESPONSIVE ( < 768px )
+   ============================================== */
+@media (max-width: 768px) {
+    .content-area {
+        padding: 1rem;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .search-bar {
+        width: 100%;
+    }
+
+    .top-bar {
+        padding: 0 1rem 0 4rem;
+        /* Left padding 4rem to clear hamburger button */
+        height: 60px;
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+        /* Smaller font on mobile */
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    /* Table horizontal scroll wrapper needed if not already present */
+    .table-container {
+        overflow-x: auto;
+    }
 }

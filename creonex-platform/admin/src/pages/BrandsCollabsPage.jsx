@@ -19,6 +19,7 @@ const BrandsCollabsPage = () => {
             // Filter for brands and collaborations
             const brandsCollabs = res.data.filter(inquiry =>
                 inquiry.type === 'collaboration' ||
+                inquiry.company || // If company name exists, treat as Brand/Collab
                 inquiry.subject?.toLowerCase().includes('brand') ||
                 inquiry.subject?.toLowerCase().includes('collab')
             );

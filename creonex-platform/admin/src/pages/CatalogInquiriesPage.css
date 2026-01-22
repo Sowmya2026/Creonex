@@ -1,5 +1,69 @@
 /* Catalog Inquiries Page Styles */
 
+/* Tabs Container */
+.tabs-container {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #f3f4f6;
+    padding-bottom: 0;
+    overflow-x: auto;
+}
+
+.tab-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #6b7280;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    position: relative;
+    bottom: -2px;
+}
+
+.tab-button:hover {
+    color: #3A2C27;
+    background: rgba(139, 111, 71, 0.05);
+}
+
+.tab-button.active {
+    color: #3A2C27;
+    border-bottom-color: #8B6F47;
+    font-weight: 600;
+}
+
+.tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 0.4rem;
+    background: #f3f4f6;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.tab-button.active .tab-count {
+    background: #8B6F47;
+    color: white;
+}
+
+.tab-button:hover .tab-count {
+    background: #8B6F47;
+    color: white;
+}
+
+
 .inquiries-list {
     display: flex;
     flex-direction: column;

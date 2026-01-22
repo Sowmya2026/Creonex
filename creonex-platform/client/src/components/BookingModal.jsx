@@ -119,13 +119,12 @@ export default function BookingModal({ isOpen, onClose, initialType = 'consultat
 
                         <div className="form-row">
                             <div className="form-group">
-                                <label>Email *</label>
+                                <label>Email (Optional)</label>
                                 <input
                                     type="email"
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    required
                                     disabled={status === 'submitting'}
                                     placeholder="your@email.com"
                                 />

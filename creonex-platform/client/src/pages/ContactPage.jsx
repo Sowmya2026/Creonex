@@ -79,18 +79,17 @@ const ContactPage = () => {
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">Email</label>
+                                    <label className="form-label">Email (Optional)</label>
                                     <input
                                         type="email"
                                         name="email"
                                         value={formData.email}
                                         onChange={handleChange}
                                         className="form-input"
-                                        required
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">Phone / WhatsApp Number</label>
+                                    <label className="form-label">WhatsApp Number *</label>
                                     <input
                                         type="tel"
                                         name="phone"

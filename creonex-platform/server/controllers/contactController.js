@@ -9,10 +9,10 @@ exports.submitContact = async (req, res) => {
     try {
         const { name, email, message, phone, company, type, subject } = req.body;
 
-        if (!name || !email || !message) {
+        if (!name || !message) {
             return res.status(400).json({
                 success: false,
-                message: 'Name, email, and message are required'
+                message: 'Name and message are required'
             });
         }
 

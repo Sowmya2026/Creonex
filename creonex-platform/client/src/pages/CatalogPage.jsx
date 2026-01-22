@@ -200,11 +200,10 @@ const CatalogPage = () => {
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>Email</label>
+                                    <label>Email (Optional)</label>
                                     <input
                                         type="email"
                                         name="email"
-                                        required
                                         className="form-input"
                                         value={formData.email}
                                         onChange={handleInputChange}
@@ -212,7 +211,7 @@ const CatalogPage = () => {
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>WhatsApp Number</label>
+                                    <label>WhatsApp Number *</label>
                                     <input
                                         type="tel"
                                         name="phone"
