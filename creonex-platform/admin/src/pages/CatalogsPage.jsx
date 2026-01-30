@@ -14,7 +14,9 @@ import {
     X,
     Upload,
     CheckCircle,
-    AlertCircle
+    AlertCircle,
+    EyeOff,
+    XCircle
 } from 'lucide-react';
 import './CatalogsPage.css';
 
@@ -26,6 +28,7 @@ const CatalogsPage = () => {
     const [showModal, setShowModal] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
+    const [statusFilter, setStatusFilter] = useState('all');
 
     // Form State
     const [formData, setFormData] = useState({
@@ -138,6 +141,23 @@ const CatalogsPage = () => {
         }
     };
 
+    const handleToggleActive = async (item) => {
+        try {
+            const newStatus = item.isActive === false ? true : false;
+
+            // Optimistic update
+            setCatalogs(catalogs.map(i =>
+                i.id === item.id ? { ...i, isActive: newStatus } : i
+            ));
+
+            await api.put(`/catalogs/${item.id}`, { isActive: newStatus });
+        } catch (error) {
+            console.error('Failed to toggle active status:', error);
+            showError('Failed to update status');
+            fetchCatalogs(); // Revert
+        }
+    };
+
     const openEditModal = (item) => {
         setEditingItem(item);
         setFormData({
@@ -197,6 +217,60 @@ const CatalogsPage = () => {
                         className="search-input"
                     />
                 </div>
+
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button
+                        onClick={() => setStatusFilter('all')}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            background: statusFilter === 'all' ? '#8B6F47' : 'white',
+                            color: statusFilter === 'all' ? 'white' : '#666',
+                            border: '1px solid #ddd',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontWeight: '600',
+                            fontSize: '0.875rem'
+                        }}
+                    >
+                        All
+                    </button>
+                    <button
+                        onClick={() => setStatusFilter('active')}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            background: statusFilter === 'active' ? '#059669' : 'white',
+                            color: statusFilter === 'active' ? 'white' : '#666',
+                            border: '1px solid #ddd',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontWeight: '600',
+                            fontSize: '0.875rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.25rem'
+                        }}
+                    >
+                        <CheckCircle size={14} /> Active
+                    </button>
+                    <button
+                        onClick={() => setStatusFilter('inactive')}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            background: statusFilter === 'inactive' ? '#dc2626' : 'white',
+                            color: statusFilter === 'inactive' ? 'white' : '#666',
+                            border: '1px solid #ddd',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontWeight: '600',
+                            fontSize: '0.875rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.25rem'
+                        }}
+                    >
+                        <XCircle size={14} /> Inactive
+                    </button>
+                </div>
             </div>
 
             {/* Grid */}
@@ -210,48 +284,74 @@ const CatalogsPage = () => {
                 </div>
             ) : (
                 <div className="grid-view">
-                    {filteredCatalogs.map(item => (
-                        <div key={item.id} className={`card ${!item.isActive ? 'opacity-75' : ''}`}>
-                            <div className="card-image-wrapper">
-                                <img
-                                    src={api.getUri() + item.coverImageUrl}
-                                    alt={item.title}
-                                    className="card-image"
-                                    onError={(e) => e.target.src = 'https://placehold.co/600x400?text=Cover+Image'}
-                                />
-                                {!item.isActive && (
-                                    <span className="status-badge inactive">Inactive</span>
-                                )}
-                            </div>
-                            <div className="card-content">
-                                <h3 className="card-title">{item.title}</h3>
-                                <div className="card-meta">
-                                    <span>${Number(item.price).toFixed(2)}</span>
-                                    <span>•</span>
-                                    <span>{item.pageCount} Pages</span>
+                    {filteredCatalogs
+                        .filter(item => {
+                            if (statusFilter === 'active') return item.isActive !== false;
+                            if (statusFilter === 'inactive') return item.isActive === false;
+                            return true;
+                        })
+                        .map(item => (
+                            <div key={item.id} className={`card ${!item.isActive ? 'opacity-75' : ''}`}>
+                                <div className="card-image-wrapper">
+                                    <img
+                                        src={api.getUri() + item.coverImageUrl}
+                                        alt={item.title}
+                                        className="card-image"
+                                        onError={(e) => e.target.src = 'https://placehold.co/600x400?text=Cover+Image'}
+                                    />
+                                    <span className={`status-badge ${item.isActive !== false ? 'active' : 'inactive'}`}
+                                        style={{
+                                            background: item.isActive !== false ? '#059669' : '#dc2626',
+                                            color: 'white',
+                                            padding: '0.25rem 0.5rem',
+                                            borderRadius: '4px',
+                                            fontSize: '0.75rem',
+                                            fontWeight: 'bold',
+                                            position: 'absolute',
+                                            top: '0.5rem',
+                                            right: '0.5rem',
+                                            zIndex: 2
+                                        }}>
+                                        {item.isActive !== false ? 'Active' : 'Inactive'}
+                                    </span>
                                 </div>
-                                <p className="card-description line-clamp-2">
-                                    {item.description}
-                                </p>
-                                <div className="card-actions">
-                                    <button
-                                        className="btn-icon"
-                                        onClick={() => openEditModal(item)}
-                                        title="Edit"
-                                    >
-                                        <Edit2 size={18} />
-                                    </button>
-                                    <button
-                                        className="btn-icon danger"
-                                        onClick={() => setShowDeleteConfirm(item.id)}
-                                        title="Delete"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
+                                <div className="card-content">
+                                    <h3 className="card-title">{item.title}</h3>
+                                    <div className="card-meta">
+                                        <span>${Number(item.price).toFixed(2)}</span>
+                                        <span>•</span>
+                                        <span>{item.pageCount} Pages</span>
+                                    </div>
+                                    <p className="card-description line-clamp-2">
+                                        {item.description}
+                                    </p>
+                                    <div className="card-actions">
+                                        <button
+                                            className="btn-icon"
+                                            onClick={() => handleToggleActive(item)}
+                                            title={item.isActive !== false ? "Deactivate" : "Activate"}
+                                            style={{ color: item.isActive !== false ? '#dc2626' : '#059669' }}
+                                        >
+                                            {item.isActive !== false ? <EyeOff size={18} /> : <Eye size={18} />}
+                                        </button>
+                                        <button
+                                            className="btn-icon"
+                                            onClick={() => openEditModal(item)}
+                                            title="Edit"
+                                        >
+                                            <Edit2 size={18} />
+                                        </button>
+                                        <button
+                                            className="btn-icon danger"
+                                            onClick={() => setShowDeleteConfirm(item.id)}
+                                            title="Delete"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                 </div>
             )}
 

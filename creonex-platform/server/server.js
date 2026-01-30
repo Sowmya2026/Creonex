@@ -63,6 +63,7 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const notesRoutes = require('./routes/notesRoutes');
 const catalogRoutes = require('./routes/catalogRoutes');
 const catalogInquiryRoutes = require('./routes/catalogInquiryRoutes');
+const linkRoutes = require('./routes/linkRoutes');
 
 app.use('/api/visitors', visitorRoutes);
 app.use('/api/contact', contactRoutes);
@@ -73,6 +74,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/notes', notesRoutes);
 app.use('/api/catalogs', catalogRoutes);
 app.use('/api/catalog-inquiries', catalogInquiryRoutes);
+app.use('/api/links', linkRoutes);
 app.use('/api/invoices', require('./routes/invoiceRoutes'));
 
 

@@ -5,6 +5,7 @@ const { protect } = require('../middleware/authMiddleware');
 
 router.post('/track', visitorController.trackVisitor);
 router.get('/', protect, visitorController.getVisitors);
+router.delete('/clear', protect, visitorController.clearVisitors);
 router.get('/analytics', protect, visitorController.getAnalytics);
 router.get('/analytics/pages', protect, visitorController.getTopPages);
 router.get('/stats', protect, visitorController.getStats);

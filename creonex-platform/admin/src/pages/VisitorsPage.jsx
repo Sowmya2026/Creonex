@@ -1,26 +1,44 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Search, MapPin, Globe, Clock, Smartphone } from 'lucide-react';
+import { Search, MapPin, Globe, Clock, Smartphone, Trash2, AlertCircle } from 'lucide-react';
+import { useToast } from '../contexts/ToastContext';
 
 const VisitorsPage = () => {
+    const { showSuccess, showError } = useToast();
     const [visitors, setVisitors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [showClearConfirm, setShowClearConfirm] = useState(false);
 
     useEffect(() => {
-        const fetchVisitors = async () => {
-            try {
-                const res = await api.get('/visitors');
-                setVisitors(res.data);
-                setLoading(false);
-            } catch (error) {
-                console.error("Failed to fetch visitors", error);
-                setLoading(false);
-            }
-        };
-
         fetchVisitors();
     }, []);
+
+    const fetchVisitors = async () => {
+        try {
+            const res = await api.get('/visitors');
+            setVisitors(res.data);
+            setLoading(false);
+        } catch (error) {
+            console.error("Failed to fetch visitors", error);
+            showError('Failed to load visitors');
+            setLoading(false);
+        }
+    };
+
+    const handleClearData = async () => {
+        try {
+            setLoading(true);
+            await api.delete('/visitors/clear');
+            showSuccess('Visitor data cleared successfully');
+            setShowClearConfirm(false);
+            fetchVisitors();
+        } catch (error) {
+            console.error('Failed to clear data:', error);
+            showError('Failed to clear data');
+            setLoading(false);
+        }
+    };
 
     const filteredVisitors = visitors.filter(visitor =>
         visitor.ip.includes(searchTerm) ||
@@ -69,16 +87,42 @@ const VisitorsPage = () => {
     return (
         <div className="page-container">
             <div className="page-header">
-                <h1 className="page-title">Recent Visitors</h1>
-                <div className="search-bar">
-                    <Search size={20} className="search-icon" />
-                    <input
-                        type="text"
-                        placeholder="Search by IP or Agent..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="search-input"
-                    />
+                <div>
+                    <h1 className="page-title">Recent Visitors</h1>
+                    <p style={{ color: '#666', fontSize: '0.9rem', marginTop: '4px' }}>
+                        Track monitoring and analytics
+                    </p>
+                </div>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <button
+                        onClick={() => setShowClearConfirm(true)}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.6rem 1rem',
+                            background: '#fee2e2',
+                            color: '#b91c1c',
+                            border: '1px solid #fecaca',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontWeight: '600',
+                            fontSize: '0.875rem'
+                        }}
+                    >
+                        <Trash2 size={16} />
+                        Clear Data
+                    </button>
+                    <div className="search-bar">
+                        <Search size={20} className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Search by IP or Agent..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="search-input"
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -142,6 +186,79 @@ const VisitorsPage = () => {
                             )}
                         </tbody>
                     </table>
+                </div>
+            )}
+
+            {/* Clear Data Confirmation Modal */}
+            {showClearConfirm && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        background: 'white',
+                        padding: '2rem',
+                        borderRadius: '12px',
+                        width: '90%',
+                        maxWidth: '400px',
+                        textAlign: 'center',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+                    }}>
+                        <div style={{
+                            width: '60px',
+                            height: '60px',
+                            background: '#fee2e2',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            margin: '0 auto 1.5rem auto'
+                        }}>
+                            <AlertCircle size={32} color="#dc2626" />
+                        </div>
+                        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', fontWeight: 'bold' }}>Clear All Visitor Data?</h3>
+                        <p style={{ color: '#666', marginBottom: '2rem', lineHeight: '1.5' }}>
+                            This action cannot be undone. This will permanently delete all visitor tracking history and analytics data.
+                        </p>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                            <button
+                                onClick={() => setShowClearConfirm(false)}
+                                style={{
+                                    padding: '0.75rem 1.5rem',
+                                    background: '#f3f4f6',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontWeight: '600',
+                                    color: '#4b5563'
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleClearData}
+                                style={{
+                                    padding: '0.75rem 1.5rem',
+                                    background: '#dc2626',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontWeight: '600',
+                                    color: 'white'
+                                }}
+                            >
+                                Yes, Clear All
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

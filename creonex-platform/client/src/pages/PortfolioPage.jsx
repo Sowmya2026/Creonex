@@ -18,7 +18,7 @@ import {
     Play
 } from 'lucide-react';
 import api from '../services/api';
-import Lightbox from '../components/Lightbox/Lightbox';
+import ProjectModal from '../components/ProjectModal/ProjectModal';
 import LoadingSpinner from '../components/LoadingSpinner/LoadingSpinner';
 import '../styles/portfolio.css';
 
@@ -28,8 +28,7 @@ const PortfolioPage = () => {
     const [filteredItems, setFilteredItems] = useState([]);
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('all');
-    const [lightboxOpen, setLightboxOpen] = useState(false);
-    const [lightboxIndex, setLightboxIndex] = useState(0);
+    const [selectedProject, setSelectedProject] = useState(null);
     const [loading, setLoading] = useState(true);
     const [imageLoadedStates, setImageLoadedStates] = useState({});
 
@@ -93,7 +92,8 @@ const PortfolioPage = () => {
             'birthday': 'Birthday',
             'events': 'Events',
             'brand': 'Brand Services',
-            'collab': 'Collab Services'
+            'collab': 'Collab Services',
+            'product_services': 'Product Services'
         };
         return labels[category] || category;
     };
@@ -106,7 +106,8 @@ const PortfolioPage = () => {
             'wedding': <Heart {...iconProps} />,
             'birthday': <Cake {...iconProps} />,
             'events': <PartyPopper {...iconProps} />,
-            'brand': <Building2 {...iconProps} />
+            'brand': <Building2 {...iconProps} />,
+            'product_services': <ImageIcon {...iconProps} />
         };
         return icons[category] || <Folder {...iconProps} />;
     };
@@ -119,9 +120,8 @@ const PortfolioPage = () => {
         return <LoadingSpinner fullScreen message="Loading portfolio..." />;
     }
 
-    const openLightbox = (index) => {
-        setLightboxIndex(index);
-        setLightboxOpen(true);
+    const handleCardClick = (item) => {
+        setSelectedProject(item);
     };
 
     return (
@@ -214,13 +214,7 @@ const PortfolioPage = () => {
                                 <div
                                     key={item.id}
                                     className={`portfolio-card ${!item.imageUrl || imageLoadedStates[item.id] ? 'loaded' : ''}`}
-                                    onClick={() => {
-                                        if (item.reelLink) {
-                                            window.open(item.reelLink, '_blank');
-                                        } else {
-                                            openLightbox(index);
-                                        }
-                                    }}
+                                    onClick={() => handleCardClick(item)}
                                     style={{ animationDelay: `${index * 0.1}s` }}
                                 >
                                     {/* Image Container */}
@@ -342,16 +336,11 @@ const PortfolioPage = () => {
                 </div>
             </section>
 
-            {/* Lightbox Modal */}
-            {lightboxOpen && filteredItems.length > 0 && (
-                <Lightbox
-                    images={filteredItems.map(item => ({
-                        src: item.imageUrl,
-                        title: item.title,
-                        description: item.description
-                    }))}
-                    initialIndex={lightboxIndex}
-                    onClose={() => setLightboxOpen(false)}
+            {/* Project Details Modal */}
+            {selectedProject && (
+                <ProjectModal
+                    item={selectedProject}
+                    onClose={() => setSelectedProject(null)}
                 />
             )}
         </>

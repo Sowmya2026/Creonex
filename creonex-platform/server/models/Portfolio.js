@@ -8,7 +8,8 @@ const { db } = require('../config/firebase-admin');
 const portfolioSchema = {
     title: String,
     description: String,
-    imageUrl: String, // URL to the image
+    imageUrl: String, // URL to the main image (kept for backward compatibility)
+    images: Array, // Array of image URLs for multiple views
     category: String, // e.g., 'catalog', 'customization', 'wedding', 'birthday'
     tags: Array, // Array of tag strings
     isFeatured: Boolean,

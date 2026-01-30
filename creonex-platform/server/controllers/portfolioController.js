@@ -136,19 +136,28 @@ exports.getPortfolioItem = async (req, res) => {
  */
 exports.createPortfolioItem = async (req, res) => {
     try {
-        const { title, description, imageUrl, category, tags, isFeatured, isActive, order, reelLink, viewsCount } = req.body;
+        let { title, description, imageUrl, images, category, tags, isFeatured, isActive, order, reelLink, viewsCount } = req.body;
 
-        if (!title || !category || (!imageUrl && !reelLink)) {
+        if (!title || !category || ((!imageUrl && (!images || images.length === 0)) && !reelLink)) {
             return res.status(400).json({
                 success: false,
-                message: 'Title, category, and either image URL or reel link are required'
+                message: 'Title, category, and either image URL(s) or reel link are required'
             });
+        }
+
+        // Ensure images array exists and sync with imageUrl
+        if (!images && imageUrl) {
+            images = [imageUrl];
+        } else if (images && images.length > 0 && !imageUrl) {
+            imageUrl = images[0];
         }
 
         const item = await firestoreService.create('portfolio', {
             title,
             description: description || '',
             imageUrl,
+            images: images || [],
+            category,
             category,
             tags: tags || [],
             isFeatured: isFeatured || false,
@@ -177,7 +186,7 @@ exports.createPortfolioItem = async (req, res) => {
 exports.updatePortfolioItem = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, imageUrl, category, tags, isFeatured, isActive, order, reelLink, viewsCount } = req.body;
+        const { title, description, imageUrl, images, category, tags, isFeatured, isActive, order, reelLink, viewsCount } = req.body;
 
         const existingItem = await firestoreService.getById('portfolio', id);
         if (!existingItem) {
@@ -190,7 +199,24 @@ exports.updatePortfolioItem = async (req, res) => {
         const updateData = {};
         if (title !== undefined) updateData.title = title;
         if (description !== undefined) updateData.description = description;
-        if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
+
+        // Handle images update
+        if (images !== undefined) {
+            updateData.images = images;
+            // Update mainImageUrl if images array changes and has content
+            if (images.length > 0) {
+                updateData.imageUrl = images[0];
+            }
+        } else if (imageUrl !== undefined) {
+            updateData.imageUrl = imageUrl;
+            // If only imageUrl is provided (legacy), update images array to contain it if it was empty or sync it
+            // However, to avoid overwriting a multi-image array with a single image if only imageUrl was sent, 
+            // we should probably only do this if images is not sent. 
+            // Better logic: if the user sends a single imageUrl, we might assume they want to switch to single image or just update main.
+            // For safety, let's assume if they send imageUrl, they might be using an old client, so we ensure images has it.
+            // But since we are updating the client too, we will send 'images'.
+        }
+
         if (category !== undefined) updateData.category = category;
         if (tags !== undefined) updateData.tags = tags;
         if (isFeatured !== undefined) updateData.isFeatured = isFeatured;

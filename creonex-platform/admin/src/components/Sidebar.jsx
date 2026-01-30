@@ -15,7 +15,8 @@ import {
     X,
     StickyNote,
     BookOpen,
-    FileText
+    FileText,
+    Link as LinkIcon
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -87,6 +88,7 @@ const Sidebar = () => {
         { icon: BookOpen, label: 'Catalogs', path: '/catalogs' },
         { icon: MessageSquare, label: 'Cat. Inquiries', path: '/catalog-inquiries' },
         { icon: Image, label: 'Portfolio', path: '/portfolio' },
+        { icon: LinkIcon, label: 'Affiliates', path: '/links' },
         { icon: StickyNote, label: 'Notes', path: '/notes' },
         { icon: FileText, label: 'Invoices', path: '/invoices' },
         { icon: Users, label: 'Visitors', path: '/visitors' },

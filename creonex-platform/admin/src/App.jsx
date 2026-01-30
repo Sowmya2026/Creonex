@@ -19,6 +19,7 @@ import NotesPage from './pages/NotesPage';
 import CatalogsPage from './pages/CatalogsPage';
 import CatalogInquiriesPage from './pages/CatalogInquiriesPage';
 import InvoiceGeneratorPage from './pages/InvoiceGeneratorPage';
+import LinksPage from './pages/LinksPage';
 
 const RequireAuth = () => {
   const { user, loading } = useAuth();
@@ -48,6 +49,7 @@ function App() {
                 <Route path="notes" element={<NotesPage />} />
                 <Route path="catalogs" element={<CatalogsPage />} />
                 <Route path="catalog-inquiries" element={<CatalogInquiriesPage />} />
+                <Route path="links" element={<LinksPage />} />
                 <Route path="users" element={<div>Users Page</div>} />
                 <Route path="invoices" element={<InvoiceGeneratorPage />} />
                 <Route path="settings" element={<div>Settings Page</div>} />

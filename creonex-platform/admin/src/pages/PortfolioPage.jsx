@@ -15,15 +15,16 @@ const PortfolioPage = () => {
     const [addItemType, setAddItemType] = useState('portfolio'); // 'portfolio' or 'reel'
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
     const [showImportModal, setShowImportModal] = useState(false);
-    const [imageFile, setImageFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
+    const [imageFiles, setImageFiles] = useState([]);
+    const [imagePreviews, setImagePreviews] = useState([]); // Previews for NEW files
     const [statusFilter, setStatusFilter] = useState('all'); // all, active, inactive
     const fileInputRef = useRef(null);
 
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        imageUrl: '',
+        imageUrl: '', // Kept for legacy/main image reference
+        images: [], // Array of image URLs
         category: 'catalog',
         tags: '',
         isFeatured: false,
@@ -59,56 +60,77 @@ const PortfolioPage = () => {
     };
 
     const handleImageSelect = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
 
-        // Validate file type
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-        if (!allowedTypes.includes(file.type)) {
-            showError('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
-            return;
-        }
+        const newFiles = [];
+        const newPreviews = [];
 
-        // Validate file size (max 10MB)
-        if (file.size > 10 * 1024 * 1024) {
-            showError('Image size must be less than 10MB');
-            return;
-        }
+        files.forEach(file => {
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                showError(`File ${file.name} is not a valid image type`);
+                return;
+            }
 
-        setImageFile(file);
+            // Validate file size (max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                showError(`File ${file.name} is too large (max 10MB)`);
+                return;
+            }
 
-        // Create preview
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImagePreview(reader.result);
-        };
-        reader.readAsDataURL(file);
+            newFiles.push(file);
+
+            // Create preview
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreviews(prev => [...prev, reader.result]);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        setImageFiles(prev => [...prev, ...newFiles]);
+    };
+
+    const removeNewImage = (index) => {
+        setImageFiles(prev => prev.filter((_, i) => i !== index));
+        setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const removeExistingImage = (index) => {
+        setFormData(prev => ({
+            ...prev,
+            images: prev.images.filter((_, i) => i !== index)
+        }));
     };
 
     const handleImageUpload = async () => {
-        if (!imageFile) return null;
+        if (imageFiles.length === 0) return [];
 
         setUploading(true);
         try {
-            const formDataUpload = new FormData();
-            formDataUpload.append('image', imageFile);
-            formDataUpload.append('folder', 'portfolio');
-
-            const response = await api.post('/upload/image', formDataUpload, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
+            const uploadPromises = imageFiles.map(file => {
+                const formDataUpload = new FormData();
+                formDataUpload.append('image', file);
+                formDataUpload.append('folder', 'portfolio');
+                return api.post('/upload/image', formDataUpload, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
             });
 
-            if (response.data.success) {
-                // Prepend server URL to the relative path
-                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-                const serverUrl = apiUrl.replace('/api', '');
-                const relativePath = response.data.data.url;
-                return serverUrl + relativePath;
-            } else {
+            const responses = await Promise.all(uploadPromises);
+
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            const serverUrl = apiUrl.replace('/api', '');
+
+            return responses.map(response => {
+                if (response.data.success) {
+                    return serverUrl + response.data.data.url;
+                }
                 throw new Error(response.data.message || 'Upload failed');
-            }
+            });
+
         } catch (error) {
             console.error('Image upload failed:', error);
             throw error;
@@ -122,30 +144,33 @@ const PortfolioPage = () => {
         setSubmitting(true);
 
         try {
-            let imageUrl = formData.imageUrl;
+            let finalImages = [...formData.images]; // Start with existing images
 
-            // If a new image file is selected, upload it first
-            if (imageFile) {
-                imageUrl = await handleImageUpload();
-                if (!imageUrl) {
-                    throw new Error('Failed to upload image');
+            // If new image files are selected, upload them
+            if (imageFiles.length > 0) {
+                const newImageUrls = await handleImageUpload();
+                if (!newImageUrls) {
+                    throw new Error('Failed to upload images');
                 }
+                finalImages = [...finalImages, ...newImageUrls];
             }
 
-            // Validate that we have an image URL
-            if (!imageUrl && !formData.reelLink && !editingId) {
-                showError('Please upload an image or provide a Reel link');
+            // Validate that we have at least one image if not a reel
+            if (finalImages.length === 0 && !formData.reelLink && !editingId) {
+                showError('Please upload at least one image or provide a Reel link');
                 setSubmitting(false);
                 return;
             }
 
             const portfolioData = {
                 ...formData,
-                imageUrl: imageUrl,
+                imageUrl: finalImages[0] || '', // Main image is the first one
+                images: finalImages,
                 tags: formData.tags.split(',').map(t => t.trim()).filter(t => t),
                 order: parseInt(formData.order) || 0,
                 reelLink: formData.reelLink,
-                viewsCount: parseInt(formData.viewsCount) || 0
+                viewsCount: parseInt(formData.viewsCount) || 0,
+                // Ensure imageUrl is updated if needed for legacy backend support logic
             };
 
             if (editingId) {
@@ -171,6 +196,7 @@ const PortfolioPage = () => {
             title: item.title,
             description: item.description || '',
             imageUrl: item.imageUrl,
+            images: item.images && item.images.length > 0 ? item.images : (item.imageUrl ? [item.imageUrl] : []),
             category: item.category || 'catalog',
             tags: (item.tags || []).join(', '),
             isFeatured: item.isFeatured || false,
@@ -179,8 +205,8 @@ const PortfolioPage = () => {
             reelLink: item.reelLink || '',
             viewsCount: item.viewsCount || 0
         });
-        setImageFile(null);
-        setImagePreview(item.imageUrl || null);
+        setImageFiles([]);
+        setImagePreviews([]);
         setEditingId(item.id);
         setAddItemType(item.reelLink ? 'reel' : 'portfolio');
         setShowAddForm(true);
@@ -252,6 +278,7 @@ const PortfolioPage = () => {
             title: '',
             description: '',
             imageUrl: '',
+            images: [],
             category: 'catalog',
             tags: '',
             isFeatured: false,
@@ -260,8 +287,8 @@ const PortfolioPage = () => {
             reelLink: '',
             viewsCount: 0
         });
-        setImageFile(null);
-        setImagePreview(null);
+        setImageFiles([]);
+        setImagePreviews([]);
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
@@ -426,6 +453,7 @@ const PortfolioPage = () => {
                                     <option value="events">Events</option>
                                     <option value="brand">Brand Services</option>
                                     <option value="collab">Collab Services</option>
+                                    <option value="product_services">Product Services</option>
                                 </select>
                             </div>
                         </div>
@@ -433,13 +461,13 @@ const PortfolioPage = () => {
                         {addItemType === 'reel' && (
                             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Instagram Reel Link *</label>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Video Link (Instagram, Drive, YouTube) *</label>
                                     <input
                                         type="text"
                                         name="reelLink"
                                         value={formData.reelLink}
                                         onChange={handleInputChange}
-                                        placeholder="https://www.instagram.com/reel/..."
+                                        placeholder="Paste Instagram, Google Drive, or YouTube link..."
                                         required
                                         style={{
                                             width: '100%',
@@ -468,12 +496,14 @@ const PortfolioPage = () => {
                             </div>
                         )}
 
+
+
+                        {/* Image Upload Area */}
                         <div style={{ marginBottom: '1rem' }}>
                             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
-                                {addItemType === 'reel' ? 'Cover Image (Reference/Optional)' : 'Image *'}
+                                {addItemType === 'reel' ? 'Cover Image (Reference/Optional)' : 'Images * (Multiple allowed)'}
                             </label>
 
-                            {/* Image Upload Area */}
                             <div
                                 onClick={() => fileInputRef.current?.click()}
                                 style={{
@@ -482,7 +512,7 @@ const PortfolioPage = () => {
                                     padding: '1.5rem',
                                     textAlign: 'center',
                                     cursor: 'pointer',
-                                    background: imagePreview ? '#f9f9f9' : '#fafafa',
+                                    background: '#fafafa',
                                     transition: 'all 0.2s ease',
                                     display: 'flex',
                                     flexDirection: 'column',
@@ -497,67 +527,41 @@ const PortfolioPage = () => {
                                 onDragLeave={(e) => {
                                     e.preventDefault();
                                     e.currentTarget.style.borderColor = '#ddd';
-                                    e.currentTarget.style.background = imagePreview ? '#f9f9f9' : '#fafafa';
+                                    e.currentTarget.style.background = '#fafafa';
                                 }}
                                 onDrop={(e) => {
                                     e.preventDefault();
                                     e.currentTarget.style.borderColor = '#ddd';
-                                    e.currentTarget.style.background = imagePreview ? '#f9f9f9' : '#fafafa';
-                                    const file = e.dataTransfer.files[0];
-                                    if (file) {
-                                        const fakeEvent = { target: { files: [file] } };
+                                    e.currentTarget.style.background = '#fafafa';
+                                    const files = e.dataTransfer.files;
+                                    if (files && files.length > 0) {
+                                        const fakeEvent = { target: { files: files } };
                                         handleImageSelect(fakeEvent);
                                     }
                                 }}
                             >
-                                {imagePreview ? (
-                                    <>
-                                        <img
-                                            src={imagePreview}
-                                            alt="Preview"
-                                            style={{
-                                                maxWidth: '100%',
-                                                maxHeight: '200px',
-                                                objectFit: 'contain',
-                                                borderRadius: '4px'
-                                            }}
-                                        />
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#666' }}>
-                                            <Upload size={18} />
-                                            <span>Click or drag to replace image</span>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div style={{
-                                            width: '60px',
-                                            height: '60px',
-                                            background: '#f0f0f0',
-                                            borderRadius: '50%',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}>
-                                            <Upload size={28} color="#888" />
-                                        </div>
-                                        <div>
-                                            <p style={{ margin: 0, fontWeight: '500', color: '#333' }}>
-                                                Click to upload or drag and drop
-                                            </p>
-                                            <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: '#888' }}>
-                                                PNG, JPG, GIF or WebP (max 10MB)
-                                            </p>
-                                        </div>
-                                    </>
-                                )}
+                                <div style={{
+                                    width: '60px',
+                                    height: '60px',
+                                    background: '#f0f0f0',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    <Upload size={28} color="#888" />
+                                </div>
+                                <div>
+                                    <p style={{ margin: 0, fontWeight: '500', color: '#333' }}>
+                                        Click to upload or drag and drop
+                                    </p>
+                                    <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: '#888' }}>
+                                        PNG, JPG, GIF or WebP (max 10MB)
+                                    </p>
+                                </div>
 
                                 {uploading && (
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        color: '#8B6F47'
-                                    }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#8B6F47' }}>
                                         <Loader className="spin" size={18} />
                                         <span>Uploading...</span>
                                     </div>
@@ -568,46 +572,94 @@ const PortfolioPage = () => {
                             <input
                                 ref={fileInputRef}
                                 type="file"
+                                multiple
                                 accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                                 onChange={handleImageSelect}
                                 style={{ display: 'none' }}
                             />
 
-                            {imageFile && (
+                            {/* Scrollable Image Previews */}
+                            {(formData.images.length > 0 || imagePreviews.length > 0) && (
                                 <div style={{
-                                    marginTop: '0.5rem',
-                                    padding: '0.5rem',
-                                    background: '#e8f5e9',
-                                    borderRadius: '4px',
-                                    fontSize: '0.85rem',
-                                    color: '#2e7d32',
                                     display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem'
+                                    gap: '1rem',
+                                    marginTop: '1rem',
+                                    overflowX: 'auto',
+                                    paddingBottom: '0.5rem',
+                                    paddingTop: '0.5rem',
+                                    scrollbarWidth: 'thin'
                                 }}>
-                                    <ImageIcon size={16} />
-                                    <span>{imageFile.name}</span>
-                                    <button
-                                        type="button"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setImageFile(null);
-                                            setImagePreview(editingId ? formData.imageUrl : null);
-                                            if (fileInputRef.current) fileInputRef.current.value = '';
-                                        }}
-                                        style={{
-                                            marginLeft: 'auto',
-                                            background: 'none',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            color: '#666'
-                                        }}
-                                    >
-                                        <X size={16} />
-                                    </button>
+                                    {/* Existing Images */}
+                                    {formData.images.map((url, index) => (
+                                        <div key={`existing-${index}`} style={{ position: 'relative', flexShrink: 0, width: '150px', height: '150px' }}>
+                                            <img
+                                                src={url}
+                                                alt={`Existing ${index}`}
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee' }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeExistingImage(index)}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '-8px',
+                                                    right: '-8px',
+                                                    background: '#ff4d4f',
+                                                    color: 'white',
+                                                    borderRadius: '50%',
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                                }}
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                            <div style={{ position: 'absolute', bottom: '2px', right: '2px', background: 'rgba(0,0,0,0.5)', color: 'white', padding: '2px 4px', borderRadius: '4px', fontSize: '10px' }}>Saved</div>
+                                        </div>
+                                    ))}
+
+                                    {/* New Previews */}
+                                    {imagePreviews.map((preview, index) => (
+                                        <div key={`new-${index}`} style={{ position: 'relative', flexShrink: 0, width: '150px', height: '150px' }}>
+                                            <img
+                                                src={preview}
+                                                alt={`Preview ${index}`}
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee' }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeNewImage(index)}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '-8px',
+                                                    right: '-8px',
+                                                    background: '#ff4d4f',
+                                                    color: 'white',
+                                                    borderRadius: '50%',
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                                }}
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                            <div style={{ position: 'absolute', bottom: '2px', right: '2px', background: 'rgba(46, 125, 50, 0.8)', color: 'white', padding: '2px 4px', borderRadius: '4px', fontSize: '10px' }}>New</div>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </div>
+
 
                         <div style={{ marginBottom: '1rem' }}>
                             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Description</label>
@@ -710,7 +762,7 @@ const PortfolioPage = () => {
                                 Cancel
                             </button>
                         </div>
-                    </form>
+                    </form >
                 </div >
             )}
 

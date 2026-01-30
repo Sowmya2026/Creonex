@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Sun, Moon, X, Home, BookOpen, Briefcase, Users, Building2, FolderOpen, BookMarked, Mail } from 'lucide-react';
+import { Sun, Moon, X, Home, BookOpen, Briefcase, Users, Building2, FolderOpen, BookMarked, Mail, ShoppingBag } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import logoLight from '../assets/images/logo-light.svg';
 import logoDark from '../assets/images/logo-dark.svg';
+import '../styles/Navbar.css';
 
 
 const Navbar = () => {
@@ -84,6 +85,7 @@ const Navbar = () => {
 
                                 <li><Link to="/portfolio" className={`nav-link ${isActive('/portfolio')}`}>Portfolio</Link></li>
                                 <li><Link to="/catalogs" className={`nav-link ${isActive('/catalogs')}`}>Catalogs</Link></li>
+                                <li><Link to="/links" className={`nav-link ${isActive('/links')}`}>Links</Link></li>
                                 <li><Link to="/contact" className={`nav-link cta-link ${isActive('/contact')}`}>Let's Contact</Link></li>
                             </ul>
 
@@ -110,13 +112,11 @@ const Navbar = () => {
             </nav>
 
             {/* Mobile Menu Backdrop */}
-            {isMobileMenuOpen && (
-                <div
-                    className="mobile-menu-backdrop"
-                    onClick={closeMobileMenu}
-                    aria-hidden="true"
-                />
-            )}
+            <div
+                className={`mobile-menu-backdrop ${isMobileMenuOpen ? 'active' : ''}`}
+                onClick={closeMobileMenu}
+                aria-hidden="true"
+            />
 
             {/* Mobile Menu Modal */}
             <div className={`mobile-menu-modal ${isMobileMenuOpen ? 'active' : ''}`}>
@@ -130,7 +130,7 @@ const Navbar = () => {
                         onClick={closeMobileMenu}
                         aria-label="Close menu"
                     >
-                        <X size={18} />
+                        <X size={28} />
                     </button>
                 </div>
 
@@ -164,6 +164,12 @@ const Navbar = () => {
                             <Link to="/catalogs" className={`mobile-nav-link ${isActive('/catalogs')}`} onClick={closeMobileMenu}>
                                 <BookMarked className="mobile-nav-icon" size={16} />
                                 <span className="mobile-nav-text">Catalogs</span>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/links" className={`mobile-nav-link ${isActive('/links')}`} onClick={closeMobileMenu}>
+                                <ShoppingBag className="mobile-nav-icon" size={16} />
+                                <span className="mobile-nav-text">Links</span>
                             </Link>
                         </li>
                         <li>

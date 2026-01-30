@@ -215,3 +215,38 @@ exports.getTopPages = async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 };
+/**
+ * @desc    Clear all visitor data
+ * @route   DELETE /api/visitors/clear
+ * @access  Private
+ */
+exports.clearVisitors = async (req, res) => {
+    try {
+        const batchSize = 100; // Small batch size for safety
+        const visitors = await firestoreService.getAll('visitors');
+
+        if (visitors.length === 0) {
+            return res.status(200).json({ success: true, message: 'No data to clear' });
+        }
+
+        // Firestore batch limit is 500
+        const chunkedVisitors = [];
+        for (let i = 0; i < visitors.length; i += 400) {
+            chunkedVisitors.push(visitors.slice(i, i + 400));
+        }
+
+        for (const chunk of chunkedVisitors) {
+            const operations = chunk.map(v => ({
+                type: 'delete',
+                collection: 'visitors',
+                id: v.id
+            }));
+            await firestoreService.batchWrite(operations);
+        }
+
+        res.status(200).json({ success: true, message: `Cleared ${visitors.length} visitor records` });
+    } catch (error) {
+        console.error('Clear Visitors Error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
