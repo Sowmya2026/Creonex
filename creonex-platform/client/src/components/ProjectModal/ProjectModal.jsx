@@ -3,6 +3,27 @@ import { X, ChevronLeft, ChevronRight, Play, Eye, Tag, Calendar } from 'lucide-r
 import { Image as ImageIcon, Sparkles, Heart, Cake, PartyPopper, Building2, Package, Folder } from 'lucide-react';
 import './ProjectModal.css';
 
+const getImageUrl = (url) => {
+    if (!url) return '';
+
+    // Handle legacy localhost URLs stored in database
+    if (url.includes('localhost:5000') || url.includes('127.0.0.1:5000')) {
+        const match = url.match(/(\/uploads\/.*)/);
+        if (match) {
+            url = match[1];
+        }
+    }
+
+    if (url.startsWith('http') || url.startsWith('data:')) return url;
+
+    // Prepend API URL (stripping /api if present)
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const serverUrl = apiBase.replace(/\/api\/?$/, '');
+
+    const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+    return `${serverUrl}${cleanUrl}`;
+};
+
 const ProjectModal = ({ item, onClose }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -108,7 +129,7 @@ const ProjectModal = ({ item, onClose }) => {
                                     <>
                                         <div className="project-slide-container">
                                             <img
-                                                src={images[currentImageIndex]}
+                                                src={getImageUrl(images[currentImageIndex])}
                                                 alt={`${item.title} - view ${currentImageIndex + 1}`}
                                                 className="project-slide-image"
                                             />

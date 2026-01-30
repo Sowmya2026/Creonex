@@ -22,6 +22,30 @@ import ProjectModal from '../components/ProjectModal/ProjectModal';
 import LoadingSpinner from '../components/LoadingSpinner/LoadingSpinner';
 import '../styles/portfolio.css';
 
+const getImageUrl = (url) => {
+    if (!url) return '';
+
+    // Handle legacy localhost URLs stored in database
+    if (url.includes('localhost:5000') || url.includes('127.0.0.1:5000')) {
+        // Extract the path part (e.g., /uploads/...)
+        const match = url.match(/(\/uploads\/.*)/);
+        if (match) {
+            url = match[1]; // Convert to relative path
+        }
+    }
+
+    if (url.startsWith('http') || url.startsWith('data:')) return url;
+
+    // Prepend API URL (stripping /api if present)
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const serverUrl = apiBase.replace(/\/api\/?$/, '');
+
+    // Ensure url starts with /
+    const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+
+    return `${serverUrl}${cleanUrl}`;
+};
+
 const PortfolioPage = () => {
     const location = useLocation();
     const [items, setItems] = useState([]);
@@ -224,10 +248,11 @@ const PortfolioPage = () => {
                                         )}
                                         {item.imageUrl ? (
                                             <img
-                                                src={item.imageUrl}
+                                                src={getImageUrl(item.imageUrl)}
                                                 alt={item.title}
                                                 onLoad={() => handleImageLoad(item.id)}
                                                 onError={(e) => {
+                                                    console.warn('Image load failed:', getImageUrl(item.imageUrl));
                                                     e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"%3E%3Crect fill="%23f0f0f0" width="400" height="300"/%3E%3Ctext fill="%23999" font-family="Arial" font-size="16" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage not available%3C/text%3E%3C/svg%3E';
                                                     handleImageLoad(item.id);
                                                 }}

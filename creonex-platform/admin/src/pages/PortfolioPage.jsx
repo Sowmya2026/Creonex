@@ -4,6 +4,16 @@ import ImportModal from '../components/ImportModal';
 import api from '../services/api';
 import { useToast } from '../contexts/ToastContext';
 
+const getImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http') || url.startsWith('data:')) return url;
+
+    // Prepend API URL (stripping /api if present)
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const serverUrl = apiBase.replace(/\/api\/?$/, '');
+    return `${serverUrl}${url}`;
+};
+
 const PortfolioPage = () => {
     const { showSuccess, showError } = useToast();
     const [items, setItems] = useState([]);
@@ -121,12 +131,9 @@ const PortfolioPage = () => {
 
             const responses = await Promise.all(uploadPromises);
 
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-            const serverUrl = apiUrl.replace('/api', '');
-
             return responses.map(response => {
                 if (response.data.success) {
-                    return serverUrl + response.data.data.url;
+                    return response.data.data.url;
                 }
                 throw new Error(response.data.message || 'Upload failed');
             });
@@ -593,7 +600,7 @@ const PortfolioPage = () => {
                                     {formData.images.map((url, index) => (
                                         <div key={`existing-${index}`} style={{ position: 'relative', flexShrink: 0, width: '150px', height: '150px' }}>
                                             <img
-                                                src={url}
+                                                src={getImageUrl(url)}
                                                 alt={`Existing ${index}`}
                                                 style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee' }}
                                             />
@@ -948,7 +955,7 @@ const PortfolioPage = () => {
                                         }}>
                                             {item.imageUrl ? (
                                                 <img
-                                                    src={item.imageUrl}
+                                                    src={getImageUrl(item.imageUrl)}
                                                     alt={item.title}
                                                     style={{
                                                         width: '100%',
