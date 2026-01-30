@@ -1,8 +1,16 @@
-import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Save, X, Loader, Power, FileUp, CheckCircle, XCircle } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Plus, Edit2, Trash2, Save, X, Loader, Power, FileUp, CheckCircle, XCircle, Upload, Image as ImageIcon } from 'lucide-react';
 import ImportModal from '../components/ImportModal';
 import api from '../services/api';
 import { useToast } from '../contexts/ToastContext';
+
+const getImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http') || url.startsWith('data:')) return url;
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const serverUrl = apiBase.replace(/\/api\/?$/, '');
+    return `${serverUrl}${url}`;
+};
 
 const ServicesPage = () => {
     const { showSuccess, showError } = useToast();
@@ -13,11 +21,20 @@ const ServicesPage = () => {
     const [showAddForm, setShowAddForm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
     const [showImportModal, setShowImportModal] = useState(false);
+
     const [statusFilter, setStatusFilter] = useState('all'); // all, active, inactive
+
+    // Image Upload State
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef(null);
+
     const [formData, setFormData] = useState({
         title: '',
         description: '',
         icon: 'Package',
+        image: '',
         category: 'customization',
         features: '',
         price: '',
@@ -50,13 +67,76 @@ const ServicesPage = () => {
         }));
     };
 
+    const handleImageSelect = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            showError(`File is not a valid image type`);
+            return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            showError(`File is too large (max 5MB)`);
+            return;
+        }
+
+        setImageFile(file);
+
+        // Create preview
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImagePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleImageUpload = async () => {
+        if (!imageFile) return null;
+
+        setUploading(true);
+        try {
+            const formDataUpload = new FormData();
+            formDataUpload.append('folder', 'services'); // Important: Append folder BEFORE image
+            formDataUpload.append('image', imageFile);
+
+            const response = await api.post('/upload/image', formDataUpload, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            if (response.data.success) {
+                return response.data.data.url;
+            }
+            throw new Error(response.data.message || 'Upload failed');
+        } catch (error) {
+            console.error('Image upload failed:', error);
+            throw error;
+        } finally {
+            setUploading(false);
+        }
+    };
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
 
         try {
+            let imageUrl = formData.image;
+
+            if (imageFile) {
+                const uploadedUrl = await handleImageUpload();
+                if (uploadedUrl) {
+                    imageUrl = uploadedUrl;
+                }
+            }
+
             const serviceData = {
                 ...formData,
+                image: imageUrl,
                 features: formData.features.split('\n').filter(f => f.trim()),
                 order: parseInt(formData.order) || 0
             };
@@ -102,12 +182,15 @@ const ServicesPage = () => {
             title: service.title,
             description: service.description,
             icon: service.icon || 'Package',
+            image: service.image || '',
             category: service.category || 'customization',
             features: (service.features || []).join('\n'),
             price: service.price || '',
             isActive: service.isActive !== false,
             order: service.order || 0
         });
+        setImageFile(null);
+        setImagePreview(service.image ? getImageUrl(service.image) : null);
         setEditingId(service.id);
         setShowAddForm(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -152,12 +235,16 @@ const ServicesPage = () => {
             title: '',
             description: '',
             icon: 'Package',
+            image: '',
             category: 'customization',
             features: '',
             price: '',
             isActive: true,
             order: 0
         });
+        setImageFile(null);
+        setImagePreview(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
         setEditingId(null);
         setShowAddForm(false);
     };
@@ -256,6 +343,96 @@ const ServicesPage = () => {
                                     }}
                                 />
                             </div>
+                        </div>
+
+
+                        {/* Image Upload Area */}
+                        <div style={{ marginBottom: '1rem' }}>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                                Service Image (Optional)
+                            </label>
+
+                            <div
+                                onClick={() => fileInputRef.current?.click()}
+                                className="file-dropzone"
+                                style={{
+                                    border: '2px dashed #ddd',
+                                    borderRadius: '8px',
+                                    padding: '1.5rem',
+                                    textAlign: 'center',
+                                    cursor: 'pointer',
+                                    background: '#fafafa',
+                                    transition: 'all 0.2s ease',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.5rem'
+                                }}
+                            >
+                                {imagePreview ? (
+                                    <div style={{ position: 'relative', width: '100%', maxWidth: '200px', margin: '0 auto' }}>
+                                        <img
+                                            src={imagePreview}
+                                            alt="Preview"
+                                            style={{ width: '100%', borderRadius: '8px', border: '1px solid #eee' }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setImageFile(null);
+                                                setImagePreview(null);
+                                                setFormData({ ...formData, image: '' });
+                                                if (fileInputRef.current) fileInputRef.current.value = '';
+                                            }}
+                                            style={{
+                                                position: 'absolute',
+                                                top: '-8px',
+                                                right: '-8px',
+                                                background: '#ff4d4f',
+                                                color: 'white',
+                                                borderRadius: '50%',
+                                                width: '24px',
+                                                height: '24px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                border: 'none',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div style={{
+                                            width: '50px',
+                                            height: '50px',
+                                            background: '#f0f0f0',
+                                            borderRadius: '50%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}>
+                                            <Upload size={24} color="#888" />
+                                        </div>
+                                        <p style={{ margin: 0, fontWeight: '500', color: '#333' }}>Click to upload image</p>
+                                        <p style={{ margin: 0, fontSize: '0.85rem', color: '#888' }}>
+                                            PNG, JPG (max 5MB)
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageSelect}
+                                style={{ display: 'none' }}
+                            />
                         </div>
 
                         <div className="grid-3" style={{ marginBottom: '1rem' }}>
@@ -400,7 +577,7 @@ const ServicesPage = () => {
                             </button>
                         </div>
                     </form>
-                </div>
+                </div >
             )}
 
             {/* Status Filter Tabs */}
@@ -460,7 +637,13 @@ const ServicesPage = () => {
             </div>
 
             {/* Services List */}
-            <div style={{ display: 'grid', gap: '1rem' }}>
+            {/* Services Grid */}
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                gap: '1.5rem',
+                marginBottom: '2rem'
+            }}>
                 {(() => {
                     const filteredServices = services.filter(service => {
                         if (statusFilter === 'active') return service.isActive !== false;
@@ -471,6 +654,7 @@ const ServicesPage = () => {
                     if (filteredServices.length === 0) {
                         return (
                             <div style={{
+                                gridColumn: '1 / -1',
                                 background: 'white',
                                 padding: '3rem',
                                 borderRadius: '8px',
@@ -480,7 +664,7 @@ const ServicesPage = () => {
                                 {statusFilter === 'all'
                                     ? 'No services yet. Click "Add Service" to create one.'
                                     : statusFilter === 'active'
-                                        ? 'No active services. Activate some services to show them on the client page.'
+                                        ? 'No active services.'
                                         : 'No inactive services.'}
                             </div>
                         );
@@ -489,165 +673,228 @@ const ServicesPage = () => {
                     return filteredServices.map(service => (
                         <div
                             key={service.id}
-                            className="list-item-card"
                             style={{
-                                opacity: service.isActive === false ? 0.6 : 1
+                                background: 'white',
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                opacity: service.isActive === false ? 0.7 : 1,
+                                border: service.isActive === false ? '1px dashed #ccc' : 'none'
                             }}
                         >
-                            <div style={{ flex: 1 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
-                                    <h3 style={{ fontSize: '1.25rem', fontWeight: '600' }}>{service.title}</h3>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <span style={{
-                                            padding: '0.25rem 0.75rem',
-                                            background: service.isActive === false ? '#f5f5f5' : '#e8f5e9',
-                                            color: service.isActive === false ? '#666' : '#2e7d32',
-                                            borderRadius: '12px',
-                                            fontSize: '0.75rem',
-                                            fontWeight: '600'
-                                        }}>
-                                            {service.isActive === false ? 'Inactive' : 'Active'}
-                                        </span>
-                                        <span style={{
-                                            padding: '0.25rem 0.75rem',
-                                            background: '#f5f5f5',
-                                            color: '#666',
-                                            borderRadius: '12px',
-                                            fontSize: '0.75rem',
-                                            textTransform: 'capitalize'
-                                        }}>
-                                            {service.category === 'catalog'
-                                                ? 'Other Services'
-                                                : service.category === 'product'
-                                                    ? 'Product Services'
-                                                    : service.category}
-                                        </span>
+                            {/* Card Image */}
+                            <div style={{
+                                height: '200px',
+                                background: '#f5f5f5',
+                                position: 'relative',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden'
+                            }}>
+                                {service.image ? (
+                                    <img
+                                        src={getImageUrl(service.image)}
+                                        alt={service.title}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = 'https://placehold.co/600x400?text=No+Image';
+                                        }}
+                                    />
+                                ) : (
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#ccc' }}>
+                                        <ImageIcon size={48} />
+                                        <span style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>No Image Set</span>
                                     </div>
+                                )}
+
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '10px',
+                                    right: '10px',
+                                    background: 'rgba(255,255,255,0.9)',
+                                    padding: '0.25rem 0.5rem',
+                                    borderRadius: '4px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: '600',
+                                    color: '#333',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                }}>
+                                    {service.category}
                                 </div>
-                                <p style={{ color: '#666', marginBottom: '0.75rem' }}>{service.description}</p>
-                                {service.features && service.features.length > 0 && (
-                                    <ul style={{ color: '#888', fontSize: '0.875rem', paddingLeft: '1.5rem' }}>
-                                        {service.features.map((feature, idx) => (
-                                            <li key={idx}>{feature}</li>
-                                        ))}
-                                    </ul>
-                                )}
-                                {service.price && (
-                                    <p style={{ color: '#8B6F47', fontWeight: '600', marginTop: '0.5rem' }}>
-                                        {service.price}
-                                    </p>
-                                )}
                             </div>
-                            <div className="list-item-actions">
-                                <button
-                                    onClick={() => handleToggleStatus(service)}
-                                    style={{
-                                        padding: '0.5rem',
-                                        background: service.isActive === false ? '#ffebee' : '#e8f5e9',
-                                        border: 'none',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer',
-                                        color: service.isActive === false ? '#c62828' : '#2e7d32'
-                                    }}
-                                    title={service.isActive === false ? "Activate" : "Deactivate"}
-                                >
-                                    <Power size={18} />
-                                </button>
-                                <button
-                                    onClick={() => handleEdit(service)}
-                                    style={{
-                                        padding: '0.5rem',
-                                        background: '#f5f5f5',
-                                        border: 'none',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer',
-                                        color: '#8B6F47'
-                                    }}
-                                    title="Edit"
-                                >
-                                    <Edit2 size={18} />
-                                </button>
-                                <button
-                                    onClick={() => handleDeleteClick(service.id)}
-                                    style={{
-                                        padding: '0.5rem',
-                                        background: '#fee2e2',
-                                        border: 'none',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer',
-                                        color: '#dc2626'
-                                    }}
-                                    title="Delete"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
+
+                            {/* Card Content */}
+                            <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                                    <h3 style={{ fontSize: '1.1rem', fontWeight: '600', margin: 0 }}>{service.title}</h3>
+                                </div>
+
+                                <p style={{ color: '#8B6F47', fontWeight: 'bold', fontSize: '0.9rem', marginBottom: '0.75rem' }}>
+                                    {service.price || 'Price on Request'}
+                                </p>
+
+                                <p style={{
+                                    color: '#666',
+                                    fontSize: '0.9rem',
+                                    marginBottom: '1rem',
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 3,
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden'
+                                }}>
+                                    {service.description}
+                                </p>
+
+                                {service.features && service.features.length > 0 && (
+                                    <div style={{ marginTop: 'auto', marginBottom: '1rem' }}>
+                                        <p style={{ fontSize: '0.75rem', fontWeight: '600', color: '#888', marginBottom: '0.25rem' }}>FEATURES:</p>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
+                                            {service.features.slice(0, 3).map((feature, idx) => (
+                                                <span key={idx} style={{
+                                                    background: '#f0f0f0',
+                                                    padding: '0.1rem 0.4rem',
+                                                    borderRadius: '4px',
+                                                    fontSize: '0.7rem',
+                                                    color: '#555'
+                                                }}>
+                                                    {feature}
+                                                </span>
+                                            ))}
+                                            {service.features.length > 3 && (
+                                                <span style={{ fontSize: '0.7rem', color: '#888', alignSelf: 'center' }}>+{service.features.length - 3} more</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div style={{
+                                    display: 'flex',
+                                    gap: '0.5rem',
+                                    marginTop: 'auto',
+                                    paddingTop: '1rem',
+                                    borderTop: '1px solid #eee'
+                                }}>
+                                    <button
+                                        onClick={() => handleToggleStatus(service)}
+                                        style={{
+                                            flex: 1,
+                                            padding: '0.5rem',
+                                            background: service.isActive === false ? '#ffefef' : '#f0fdf4',
+                                            color: service.isActive === false ? '#d32f2f' : '#15803d',
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontWeight: '600',
+                                            fontSize: '0.85rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '0.25rem'
+                                        }}
+                                    >
+                                        <Power size={14} />
+                                        {service.isActive === false ? 'Inactive' : 'Active'}
+                                    </button>
+                                    <button
+                                        onClick={() => handleEdit(service)}
+                                        style={{
+                                            padding: '0.5rem',
+                                            background: '#f8f9fa',
+                                            color: '#444',
+                                            border: '1px solid #dee2e6',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer'
+                                        }}
+                                        title="Edit"
+                                        aria-label="Edit"
+                                    >
+                                        <Edit2 size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteClick(service.id)}
+                                        style={{
+                                            padding: '0.5rem',
+                                            background: '#fff5f5',
+                                            color: '#c53030',
+                                            border: '1px solid #fed7d7',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer'
+                                        }}
+                                        title="Delete"
+                                        aria-label="Delete"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ));
                 })()}
             </div>
 
-            {/* Delete Confirmation Modal */}
-            {
-                showDeleteConfirm && (
+            {showDeleteConfirm && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
                     <div style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: 'rgba(0,0,0,0.5)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000
+                        background: 'white',
+                        padding: '2rem',
+                        borderRadius: '8px',
+                        maxWidth: '400px',
+                        width: '90%'
                     }}>
-                        <div style={{
-                            background: 'white',
-                            padding: '2rem',
-                            borderRadius: '8px',
-                            maxWidth: '400px',
-                            width: '90%'
-                        }}>
-                            <h3 style={{ marginBottom: '1rem', fontSize: '1.25rem' }}>Confirm Delete</h3>
-                            <p style={{ marginBottom: '1.5rem', color: '#666' }}>
-                                Are you sure you want to delete this service? This action cannot be undone.
-                            </p>
-                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                                <button
-                                    onClick={() => setShowDeleteConfirm(null)}
-                                    style={{
-                                        padding: '0.75rem 1.5rem',
-                                        background: '#f5f5f5',
-                                        border: '1px solid #ddd',
-                                        borderRadius: '6px',
-                                        cursor: 'pointer',
-                                        fontWeight: '600'
-                                    }}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleDeleteConfirm}
-                                    style={{
-                                        padding: '0.75rem 1.5rem',
-                                        background: '#dc2626',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '6px',
-                                        cursor: 'pointer',
-                                        fontWeight: '600'
-                                    }}
-                                >
-                                    Delete
-                                </button>
-                            </div>
+                        <h3 style={{ marginBottom: '1rem', fontSize: '1.25rem' }}>Confirm Delete</h3>
+                        <p style={{ marginBottom: '1.5rem', color: '#666' }}>
+                            Are you sure you want to delete this service? This action cannot be undone.
+                        </p>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                            <button
+                                onClick={() => setShowDeleteConfirm(null)}
+                                style={{
+                                    padding: '0.75rem 1.5rem',
+                                    background: '#f5f5f5',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeleteConfirm}
+                                style={{
+                                    padding: '0.75rem 1.5rem',
+                                    background: '#dc2626',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                Delete
+                            </button>
                         </div>
                     </div>
-                )
+                </div>
+            )
             }
 
-            <ImportModal
+            < ImportModal
                 isOpen={showImportModal}
                 onClose={() => setShowImportModal(false)}
                 onImport={handleImportData}

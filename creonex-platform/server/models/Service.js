@@ -9,6 +9,7 @@ const serviceSchema = {
     title: String,
     description: String,
     icon: String, // Icon name from lucide-react
+    image: String, // URL to service image
     category: String, // e.g., 'customization', 'catalog', 'brand'
     features: Array, // Array of feature strings
     price: String, // Optional price display

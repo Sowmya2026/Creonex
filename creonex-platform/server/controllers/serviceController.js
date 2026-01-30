@@ -81,7 +81,7 @@ exports.getService = async (req, res) => {
  */
 exports.createService = async (req, res) => {
     try {
-        const { title, description, icon, category, features, price, isActive, order } = req.body;
+        const { title, description, icon, image, category, features, price, isActive, order } = req.body;
 
         // Validation
         if (!title || !description) {
@@ -95,6 +95,7 @@ exports.createService = async (req, res) => {
             title,
             description,
             icon: icon || 'Package',
+            image: image || '',
             category: category || 'general',
             features: features || [],
             price: price || null,
@@ -121,7 +122,7 @@ exports.createService = async (req, res) => {
 exports.updateService = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, icon, category, features, price, isActive, order } = req.body;
+        const { title, description, icon, image, category, features, price, isActive, order } = req.body;
 
         // Check if service exists
         const existingService = await firestoreService.getById('services', id);
@@ -135,7 +136,9 @@ exports.updateService = async (req, res) => {
         const updateData = {};
         if (title !== undefined) updateData.title = title;
         if (description !== undefined) updateData.description = description;
+
         if (icon !== undefined) updateData.icon = icon;
+        if (image !== undefined) updateData.image = image;
         if (category !== undefined) updateData.category = category;
         if (features !== undefined) updateData.features = features;
         if (price !== undefined) updateData.price = price;

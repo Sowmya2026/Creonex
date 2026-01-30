@@ -16,6 +16,14 @@ const ICON_MAP = {
     Shirt, Star, Award, Zap
 };
 
+const getImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http') || url.startsWith('data:')) return url;
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const serverUrl = apiBase.replace(/\/api\/?$/, '');
+    return `${serverUrl}${url}`;
+};
+
 const ServicesPage = () => {
     const navigate = useNavigate();
     const [services, setServices] = useState([]);
@@ -98,7 +106,7 @@ const ServicesPage = () => {
         if (!categoryServices || categoryServices.length === 0) return null;
 
         return (
-            <div style={{ marginBottom: '4rem' }}>
+            <div key={categoryKey} style={{ marginBottom: '4rem' }}>
                 {title && (
                     <h3 style={{ fontSize: '1.75rem', marginBottom: '2rem', textAlign: 'center' }}>
                         {title}
@@ -108,92 +116,108 @@ const ServicesPage = () => {
                     {categoryServices.map((service) => {
                         const Icon = getIconComponent(service.icon);
                         return (
-                            <div key={service.id} className="service-card">
-                                <div className="service-icon">
-                                    <Icon />
-                                </div>
-                                <h3 className="service-title">{service.title}</h3>
-                                <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                                    {service.description}
-                                </p>
-                                {service.features && service.features.length > 0 && (
-                                    <ul className="service-features">
-                                        {service.features.map((feature, idx) => (
-                                            <li key={idx}>{feature}</li>
-                                        ))}
-                                    </ul>
+                            <div key={service.id} className="service-card" style={{ padding: service.image ? '0 0 1.5rem 0' : '2rem', overflow: 'hidden' }}>
+                                {service.image ? (
+                                    <div style={{ width: '100%', height: '200px', marginBottom: '1rem', overflow: 'hidden' }}>
+                                        <img
+                                            src={getImageUrl(service.image)}
+                                            alt={service.title}
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.src = 'https://placehold.co/600x400?text=No+Image';
+                                            }}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="service-icon">
+                                        <Icon />
+                                    </div>
                                 )}
-                                {service.price && (
-                                    <p style={{
-                                        color: 'var(--accent-color)',
-                                        fontWeight: '600',
-                                        marginTop: '1rem'
-                                    }}>
-                                        {/^\d+$/.test(service.price) ? `Starting from ₹${service.price}` : service.price}
+                                <div style={{ padding: service.image ? '0 1.5rem' : '0' }}>
+                                    <h3 className="service-title">{service.title}</h3>
+                                    <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+                                        {service.description}
                                     </p>
-                                )}
+                                    {service.features && service.features.length > 0 && (
+                                        <ul className="service-features">
+                                            {service.features.map((feature, idx) => (
+                                                <li key={idx}>{feature}</li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                    {service.price && (
+                                        <p style={{
+                                            color: 'var(--accent-color)',
+                                            fontWeight: '600',
+                                            marginTop: '1rem'
+                                        }}>
+                                            {/^\d+$/.test(service.price) ? `Starting from ₹${service.price}` : service.price}
+                                        </p>
+                                    )}
 
-                                <button
-                                    className="service-connect-btn"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate('/contact', { state: { serviceTitle: service.title } });
-                                    }}
-                                    style={{
-                                        marginTop: '1.5rem',
-                                        padding: '0.75rem 1.5rem',
-                                        backgroundColor: 'var(--primary-color)',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: 'var(--radius-sm)',
-                                        fontWeight: '600',
-                                        cursor: 'pointer',
-                                        width: '100%',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '0.5rem',
-                                        transition: 'background-color 0.2s'
-                                    }}
-                                >
-                                    Let's Connect
-                                </button>
+                                    <button
+                                        className="service-connect-btn"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate('/contact', { state: { serviceTitle: service.title } });
+                                        }}
+                                        style={{
+                                            marginTop: '1.5rem',
+                                            padding: '0.75rem 1.5rem',
+                                            backgroundColor: 'var(--primary-color)',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: 'var(--radius-sm)',
+                                            fontWeight: '600',
+                                            cursor: 'pointer',
+                                            width: '100%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '0.5rem',
+                                            transition: 'background-color 0.2s'
+                                        }}
+                                    >
+                                        Let's Connect
+                                    </button>
 
-                                <button
-                                    className="service-samples-btn"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate('/portfolio', { state: { filterCategory: service.category } });
-                                    }}
-                                    style={{
-                                        marginTop: '0.75rem',
-                                        padding: '0.65rem 1.25rem',
-                                        backgroundColor: 'transparent',
-                                        color: 'var(--accent-color)',
-                                        border: '2px solid var(--accent-color)',
-                                        borderRadius: 'var(--radius-sm)',
-                                        fontWeight: '600',
-                                        cursor: 'pointer',
-                                        width: '100%',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '0.5rem',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'var(--accent-color)';
-                                        e.currentTarget.style.color = 'white';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'transparent';
-                                        e.currentTarget.style.color = 'var(--accent-color)';
-                                    }}
-                                >
-                                    <Images size={18} />
-                                    View Samples
-                                </button>
+                                    <button
+                                        className="service-samples-btn"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate('/portfolio', { state: { filterCategory: service.category } });
+                                        }}
+                                        style={{
+                                            marginTop: '0.75rem',
+                                            padding: '0.65rem 1.25rem',
+                                            backgroundColor: 'transparent',
+                                            color: 'var(--accent-color)',
+                                            border: '2px solid var(--accent-color)',
+                                            borderRadius: 'var(--radius-sm)',
+                                            fontWeight: '600',
+                                            cursor: 'pointer',
+                                            width: '100%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '0.5rem',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.backgroundColor = 'var(--accent-color)';
+                                            e.currentTarget.style.color = 'white';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.backgroundColor = 'transparent';
+                                            e.currentTarget.style.color = 'var(--accent-color)';
+                                        }}
+                                    >
+                                        <Images size={18} />
+                                        View Samples
+                                    </button>
 
+                                </div>
                                 <div
                                     className="service-overlay"
                                     onClick={() => navigate('/contact', { state: { serviceTitle: service.title } })}
