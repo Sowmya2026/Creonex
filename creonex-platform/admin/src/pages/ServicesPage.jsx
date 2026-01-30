@@ -167,10 +167,10 @@ const ServicesPage = () => {
     }
 
     return (
-        <div style={{ padding: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div className="page-padding">
+            <div className="header-actions">
                 <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>Services Management</h1>
-                <div style={{ display: 'flex', gap: '1rem' }}>
+                <div className="action-buttons">
                     <button
                         onClick={() => setShowImportModal(true)}
                         style={{
@@ -223,7 +223,7 @@ const ServicesPage = () => {
                         {editingId ? 'Edit Service' : 'Add New Service'}
                     </h2>
                     <form onSubmit={handleSubmit}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                        <div className="grid-2" style={{ marginBottom: '1rem' }}>
                             <div>
                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Title *</label>
                                 <input
@@ -258,7 +258,7 @@ const ServicesPage = () => {
                             </div>
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                        <div className="grid-3" style={{ marginBottom: '1rem' }}>
                             <div>
                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Category</label>
                                 <select
@@ -404,17 +404,7 @@ const ServicesPage = () => {
             )}
 
             {/* Status Filter Tabs */}
-            <div style={{
-                display: 'flex',
-                gap: '0.5rem',
-                marginBottom: '1.5rem',
-                background: 'white',
-                padding: '0.75rem',
-                borderRadius: '8px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                alignItems: 'center',
-                flexWrap: 'wrap'
-            }}>
+            <div className="filter-tabs">
                 <span style={{ fontWeight: '600', color: '#666', marginRight: '0.5rem' }}>Filter:</span>
                 <button
                     onClick={() => setStatusFilter('all')}
@@ -499,44 +489,40 @@ const ServicesPage = () => {
                     return filteredServices.map(service => (
                         <div
                             key={service.id}
+                            className="list-item-card"
                             style={{
-                                background: 'white',
-                                padding: '1.5rem',
-                                borderRadius: '8px',
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'start',
                                 opacity: service.isActive === false ? 0.6 : 1
                             }}
                         >
                             <div style={{ flex: 1 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
                                     <h3 style={{ fontSize: '1.25rem', fontWeight: '600' }}>{service.title}</h3>
-                                    <span style={{
-                                        padding: '0.25rem 0.75rem',
-                                        background: service.isActive === false ? '#f5f5f5' : '#e8f5e9',
-                                        color: service.isActive === false ? '#666' : '#2e7d32',
-                                        borderRadius: '12px',
-                                        fontSize: '0.75rem',
-                                        fontWeight: '600'
-                                    }}>
-                                        {service.isActive === false ? 'Inactive' : 'Active'}
-                                    </span>
-                                    <span style={{
-                                        padding: '0.25rem 0.75rem',
-                                        background: '#f5f5f5',
-                                        color: '#666',
-                                        borderRadius: '12px',
-                                        fontSize: '0.75rem',
-                                        textTransform: 'capitalize'
-                                    }}>
-                                        {service.category === 'catalog'
-                                            ? 'Other Services we provide'
-                                            : service.category === 'product'
-                                                ? 'Product Services'
-                                                : service.category}
-                                    </span>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <span style={{
+                                            padding: '0.25rem 0.75rem',
+                                            background: service.isActive === false ? '#f5f5f5' : '#e8f5e9',
+                                            color: service.isActive === false ? '#666' : '#2e7d32',
+                                            borderRadius: '12px',
+                                            fontSize: '0.75rem',
+                                            fontWeight: '600'
+                                        }}>
+                                            {service.isActive === false ? 'Inactive' : 'Active'}
+                                        </span>
+                                        <span style={{
+                                            padding: '0.25rem 0.75rem',
+                                            background: '#f5f5f5',
+                                            color: '#666',
+                                            borderRadius: '12px',
+                                            fontSize: '0.75rem',
+                                            textTransform: 'capitalize'
+                                        }}>
+                                            {service.category === 'catalog'
+                                                ? 'Other Services'
+                                                : service.category === 'product'
+                                                    ? 'Product Services'
+                                                    : service.category}
+                                        </span>
+                                    </div>
                                 </div>
                                 <p style={{ color: '#666', marginBottom: '0.75rem' }}>{service.description}</p>
                                 {service.features && service.features.length > 0 && (
@@ -552,7 +538,7 @@ const ServicesPage = () => {
                                     </p>
                                 )}
                             </div>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <div className="list-item-actions">
                                 <button
                                     onClick={() => handleToggleStatus(service)}
                                     style={{

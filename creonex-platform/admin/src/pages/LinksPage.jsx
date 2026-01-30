@@ -261,9 +261,9 @@ const LinksPage = () => {
     }
 
     return (
-        <div style={{ padding: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>Affiliate Links</h1>
+        <div className="page-padding">
+            <div className="header-actions">
+                <h1 className="page-title">Affiliate Links</h1>
                 {!showAddForm ? (
                     <button
                         onClick={() => {
@@ -321,8 +321,8 @@ const LinksPage = () => {
                         {editingId ? 'Edit Link' : 'Add New Link'}
                     </h2>
                     <form onSubmit={handleSubmit}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                            <div style={{ gridColumn: '1 / span 1' }}>
+                        <div className="grid-3" style={{ marginBottom: '1rem' }}>
+                            <div>
                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Title *</label>
                                 <input
                                     type="text"
@@ -603,17 +603,7 @@ const LinksPage = () => {
             )}
 
             {/* Status Filter Tabs */}
-            <div style={{
-                display: 'flex',
-                gap: '0.5rem',
-                marginBottom: '1.5rem',
-                background: 'white',
-                padding: '0.75rem',
-                borderRadius: '8px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                alignItems: 'center',
-                flexWrap: 'wrap'
-            }}>
+            <div className="filter-tabs">
                 <span style={{ fontWeight: '600', color: '#666', marginRight: '0.5rem' }}>Filter:</span>
                 <button
                     onClick={() => setStatusFilter('all')}
@@ -669,7 +659,7 @@ const LinksPage = () => {
             </div>
 
             {/* List of Links */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+            <div className="portfolio-grid">
                 {items.filter(item => {
                     if (statusFilter === 'active') return item.isActive !== false;
                     if (statusFilter === 'inactive') return item.isActive === false;

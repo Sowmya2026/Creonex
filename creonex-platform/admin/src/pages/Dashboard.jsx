@@ -53,7 +53,7 @@ const Dashboard = () => {
     ];
 
     return (
-        <div>
+        <div className="page-padding">
             {/* Stats Grid */}
             <div className="stats-grid">
                 {statsData.map((stat, index) => (
@@ -63,8 +63,8 @@ const Dashboard = () => {
 
             {/* Main Chart */}
             <div className="chart-container">
-                <div className="chart-header">
-                    <h3 className="chart-title">Visitor Analytics</h3>
+                <div className="header-actions" style={{ marginBottom: '1.5rem', justifyContent: 'space-between' }}>
+                    <h3 className="chart-title" style={{ margin: 0 }}>Visitor Analytics</h3>
                     <select style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd' }}>
                         <option>Last 7 Days</option>
                         <option>Last 30 Days</option>

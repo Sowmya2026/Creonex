@@ -187,8 +187,8 @@ const CatalogsPage = () => {
     );
 
     return (
-        <div className="page-container">
-            <div className="page-header">
+        <div className="page-padding">
+            <div className="header-actions">
                 <div>
                     <h1 className="page-title">Design Catalogs</h1>
                     <p className="page-subtitle">Manage your PDF design catalogs for sale</p>
@@ -206,8 +206,8 @@ const CatalogsPage = () => {
             </div>
 
             {/* Search and Filter */}
-            <div className="filters-bar">
-                <div className="search-wrapper">
+            <div className="filter-tabs">
+                <div className="search-wrapper" style={{ marginRight: 'auto', minWidth: '200px' }}>
                     <Search size={20} className="search-icon" />
                     <input
                         type="text"
@@ -218,7 +218,7 @@ const CatalogsPage = () => {
                     />
                 </div>
 
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <button
                         onClick={() => setStatusFilter('all')}
                         style={{
@@ -283,7 +283,7 @@ const CatalogsPage = () => {
                     <p>Get started by creating your first design catalog.</p>
                 </div>
             ) : (
-                <div className="grid-view">
+                <div className="portfolio-grid">
                     {filteredCatalogs
                         .filter(item => {
                             if (statusFilter === 'active') return item.isActive !== false;

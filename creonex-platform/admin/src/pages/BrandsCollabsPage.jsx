@@ -113,9 +113,9 @@ const BrandsCollabsPage = () => {
     const completedCount = inquiries.filter(i => i.status === 'completed').length;
 
     return (
-        <div className="page-container">
-            <div className="page-header">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div className="page-padding">
+            <div className="header-actions">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                     <h1 className="page-title">Brands & Collaborations</h1>
                     <button
                         onClick={() => navigate('/portfolio')}
@@ -153,15 +153,7 @@ const BrandsCollabsPage = () => {
             </div>
 
             {/* Status Filter Tabs */}
-            <div style={{
-                display: 'flex',
-                gap: '0.5rem',
-                marginBottom: '1.5rem',
-                background: 'white',
-                padding: '0.5rem',
-                borderRadius: '8px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-            }}>
+            <div className="filter-tabs">
                 <button
                     onClick={() => setStatusFilter('all')}
                     style={{

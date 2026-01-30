@@ -151,8 +151,8 @@ const NotesPage = () => {
     const completedCount = notes.filter(n => n.status === 'completed').length;
 
     return (
-        <div className="page-container">
-            <div className="page-header">
+        <div className="page-padding">
+            <div className="header-actions">
                 <h1 className="page-title">My Notes</h1>
                 <div className="search-bar">
                     <Search size={20} className="search-icon" />
@@ -175,7 +175,8 @@ const NotesPage = () => {
                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                 display: 'flex',
                 gap: '0.75rem',
-                alignItems: 'flex-start'
+                alignItems: 'flex-start',
+                flexWrap: 'wrap'
             }}>
                 <textarea
                     value={newNote}
@@ -198,7 +199,8 @@ const NotesPage = () => {
                         minHeight: '50px',
                         maxHeight: '120px',
                         outline: 'none',
-                        transition: 'border-color 0.2s'
+                        transition: 'border-color 0.2s',
+                        minWidth: '200px'
                     }}
                     onFocus={(e) => e.target.style.borderColor = '#8B6F47'}
                     onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
@@ -217,7 +219,8 @@ const NotesPage = () => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '0.5rem',
-                        transition: 'background 0.2s'
+                        transition: 'background 0.2s',
+                        whiteSpace: 'nowrap'
                     }}
                 >
                     <Send size={18} />
@@ -226,15 +229,7 @@ const NotesPage = () => {
             </form>
 
             {/* Status Filter Tabs */}
-            <div style={{
-                display: 'flex',
-                gap: '0.5rem',
-                marginBottom: '1.5rem',
-                background: 'white',
-                padding: '0.5rem',
-                borderRadius: '8px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-            }}>
+            <div className="filter-tabs">
                 <button
                     onClick={() => setStatusFilter('all')}
                     style={{
@@ -307,18 +302,16 @@ const NotesPage = () => {
                     {filteredNotes.map(note => (
                         <div
                             key={note.id}
+                            className="list-item-card"
                             style={{
-                                background: note.status === 'completed' ? '#f9fafb' : 'white',
-                                borderRadius: '10px',
-                                padding: '1rem 1.25rem',
-                                boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
                                 borderLeft: `4px solid ${note.status === 'completed' ? '#059669' : '#8B6F47'}`,
-                                opacity: note.status === 'completed' ? 0.75 : 1
+                                opacity: note.status === 'completed' ? 0.75 : 1,
+                                background: note.status === 'completed' ? '#f9fafb' : 'white'
                             }}
                         >
                             {editingId === note.id ? (
-                                // Edit mode
-                                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                                // Edit mode uses full width
+                                <div style={{ width: '100%', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                                     <textarea
                                         value={editContent}
                                         onChange={(e) => setEditContent(e.target.value)}
@@ -331,10 +324,11 @@ const NotesPage = () => {
                                             fontSize: '0.95rem',
                                             fontFamily: 'inherit',
                                             resize: 'vertical',
-                                            minHeight: '60px'
+                                            minHeight: '60px',
+                                            minWidth: '200px'
                                         }}
                                     />
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
                                         <button
                                             onClick={handleSaveEdit}
                                             style={{
@@ -365,7 +359,7 @@ const NotesPage = () => {
                                 </div>
                             ) : (
                                 // View mode
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+                                <>
                                     <div style={{ flex: 1 }}>
                                         <p style={{
                                             fontSize: '0.95rem',
@@ -391,7 +385,7 @@ const NotesPage = () => {
                                             </span>
                                         )}
                                     </div>
-                                    <div style={{ display: 'flex', gap: '0.35rem', flexShrink: 0 }}>
+                                    <div className="list-item-actions">
                                         <button
                                             onClick={() => handleStatusChange(note.id, note.status === 'completed' ? 'pending' : 'completed')}
                                             style={{
@@ -400,7 +394,8 @@ const NotesPage = () => {
                                                 color: note.status === 'completed' ? '#059669' : '#d97706',
                                                 border: 'none',
                                                 borderRadius: '6px',
-                                                cursor: 'pointer'
+                                                cursor: 'pointer',
+                                                marginRight: '0.35rem'
                                             }}
                                             title={note.status === 'completed' ? 'Mark as pending' : 'Mark as done'}
                                         >
@@ -414,7 +409,8 @@ const NotesPage = () => {
                                                 border: 'none',
                                                 borderRadius: '6px',
                                                 cursor: 'pointer',
-                                                color: '#8B6F47'
+                                                color: '#8B6F47',
+                                                marginRight: '0.35rem'
                                             }}
                                             title="Edit"
                                         >
@@ -435,7 +431,7 @@ const NotesPage = () => {
                                             <Trash2 size={16} />
                                         </button>
                                     </div>
-                                </div>
+                                </>
                             )}
                         </div>
                     ))}

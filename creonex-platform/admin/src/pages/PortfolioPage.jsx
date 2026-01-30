@@ -312,10 +312,10 @@ const PortfolioPage = () => {
     }
 
     return (
-        <div style={{ padding: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div className="page-padding">
+            <div className="header-actions">
                 <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>Portfolio Management</h1>
-                <div style={{ display: 'flex', gap: '1rem' }}>
+                <div className="action-buttons">
                     <button
                         onClick={() => setShowImportModal(true)}
                         style={{
@@ -422,7 +422,7 @@ const PortfolioPage = () => {
                         {editingId ? `Edit ${addItemType === 'reel' ? 'Reel' : 'Portfolio Item'}` : `Add New ${addItemType === 'reel' ? 'Reel' : 'Work'}`}
                     </h2>
                     <form onSubmit={handleSubmit}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                        <div className="grid-2" style={{ marginBottom: '1rem' }}>
                             <div>
                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Title *</label>
                                 <input
@@ -466,7 +466,7 @@ const PortfolioPage = () => {
                         </div>
 
                         {addItemType === 'reel' && (
-                            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                            <div className="grid-2" style={{ marginBottom: '1rem', gridTemplateColumns: '2fr 1fr' }}>
                                 <div>
                                     <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Video Link (Instagram, Drive, YouTube) *</label>
                                     <input
@@ -513,19 +513,7 @@ const PortfolioPage = () => {
 
                             <div
                                 onClick={() => fileInputRef.current?.click()}
-                                style={{
-                                    border: '2px dashed #ddd',
-                                    borderRadius: '8px',
-                                    padding: '1.5rem',
-                                    textAlign: 'center',
-                                    cursor: 'pointer',
-                                    background: '#fafafa',
-                                    transition: 'all 0.2s ease',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    gap: '1rem'
-                                }}
+                                className="file-dropzone"
                                 onDragOver={(e) => {
                                     e.preventDefault();
                                     e.currentTarget.style.borderColor = '#8B6F47';
@@ -774,17 +762,7 @@ const PortfolioPage = () => {
             )}
 
             {/* Status Filter Tabs */}
-            <div style={{
-                display: 'flex',
-                gap: '0.5rem',
-                marginBottom: '1.5rem',
-                background: 'white',
-                padding: '0.75rem',
-                borderRadius: '8px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                alignItems: 'center',
-                flexWrap: 'wrap'
-            }}>
+            <div className="filter-tabs">
                 <span style={{ fontWeight: '600', color: '#666', marginRight: '0.5rem' }}>Filter:</span>
                 <button
                     onClick={() => setStatusFilter('all')}
@@ -849,7 +827,7 @@ const PortfolioPage = () => {
                     });
 
                     return (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                        <div className="portfolio-grid">
                             {filteredItems.length === 0 ? (
                                 <div style={{
                                     gridColumn: '1 / -1',

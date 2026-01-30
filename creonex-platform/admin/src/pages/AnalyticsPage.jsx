@@ -38,8 +38,10 @@ const AnalyticsPage = () => {
     }, []);
 
     return (
-        <div className="page-container">
-            <h1 className="page-title">Analytics Dashboard</h1>
+        <div className="page-padding">
+            <div className="header-actions">
+                <h1 className="page-title">Analytics Dashboard</h1>
+            </div>
 
             {loading ? (
                 <div className="loading-state">Loading analytics...</div>
@@ -95,43 +97,49 @@ const AnalyticsPage = () => {
                         <div className="chart-header">
                             <h3 className="chart-title">Top Viewed Pages</h3>
                         </div>
-                        <div className="table-container" style={{ boxShadow: 'none' }}>
-                            <table className="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Page URL</th>
-                                        <th>Total Views</th>
-                                        <th>Unique Visitors</th>
-                                        <th>Views per Visitor</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {topPages.map((page, index) => (
-                                        <tr key={index}>
-                                            <td className="font-medium" style={{ color: '#3A2C27' }}>{page.page}</td>
-                                            <td>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                    <div style={{
-                                                        width: `${(page.views / Math.max(...topPages.map(p => p.views))) * 100}px`,
-                                                        height: '6px',
-                                                        background: '#3A2C27',
-                                                        borderRadius: '3px',
-                                                        maxWidth: '100px'
-                                                    }}></div>
-                                                    {page.views}
-                                                </div>
-                                            </td>
-                                            <td>{page.visitors}</td>
-                                            <td>{(page.views / page.visitors).toFixed(1)}</td>
-                                        </tr>
-                                    ))}
-                                    {topPages.length === 0 && (
-                                        <tr>
-                                            <td colSpan="4" className="empty-state">No page data available</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                        <div style={{ display: 'grid', gap: '1rem' }}>
+                            {topPages.map((page, index) => (
+                                <div
+                                    key={index}
+                                    className="list-item-card"
+                                    style={{
+                                        borderLeft: `4px solid ${index < 3 ? '#8B6F47' : '#ddd'}`
+                                    }}
+                                >
+                                    <div style={{ width: '100%' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '0.75rem' }}>
+                                            <h4 style={{ fontSize: '1rem', fontWeight: 'bold', color: '#3A2C27', margin: 0, wordBreak: 'break-all' }}>
+                                                {page.page}
+                                            </h4>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <div style={{
+                                                    width: `${(page.views / Math.max(...topPages.map(p => p.views))) * 100}px`,
+                                                    height: '6px',
+                                                    background: '#3A2C27',
+                                                    borderRadius: '3px',
+                                                    maxWidth: '100px',
+                                                    minWidth: '10px'
+                                                }}></div>
+                                                <span style={{ fontWeight: '700', color: '#3A2C27' }}>{page.views} views</span>
+                                            </div>
+                                        </div>
+
+                                        <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.85rem', color: '#666', flexWrap: 'wrap' }}>
+                                            <div>
+                                                <span style={{ fontWeight: '600' }}>Unique Visitors:</span> {page.visitors}
+                                            </div>
+                                            <div>
+                                                <span style={{ fontWeight: '600' }}>Views/Visitor:</span> {(page.views / page.visitors).toFixed(1)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            {topPages.length === 0 && (
+                                <div className="empty-state" style={{ background: 'white', padding: '2rem', textAlign: 'center', color: '#888' }}>
+                                    No page data available
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

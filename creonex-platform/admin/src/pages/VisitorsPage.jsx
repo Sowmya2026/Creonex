@@ -85,15 +85,15 @@ const VisitorsPage = () => {
     };
 
     return (
-        <div className="page-container">
-            <div className="page-header">
+        <div className="page-padding">
+            <div className="header-actions">
                 <div>
                     <h1 className="page-title">Recent Visitors</h1>
                     <p style={{ color: '#666', fontSize: '0.9rem', marginTop: '4px' }}>
                         Track monitoring and analytics
                     </p>
                 </div>
-                <div style={{ display: 'flex', gap: '1rem' }}>
+                <div className="action-buttons">
                     <button
                         onClick={() => setShowClearConfirm(true)}
                         style={{
@@ -129,63 +129,54 @@ const VisitorsPage = () => {
             {loading ? (
                 <div className="loading-state">Loading visitors...</div>
             ) : (
-                <div className="table-container">
-                    <table className="data-table">
-                        <thead>
-                            <tr>
-                                <th>IP Address</th>
-                                <th>Device / Agent</th>
-                                <th>Visits</th>
-                                <th>Last Visit</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredVisitors.length > 0 ? (
-                                filteredVisitors.map((visitor) => (
-                                    <tr key={visitor.id}>
-                                        <td className="font-medium">
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></div>
-                                                {visitor.ip}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666', fontSize: '0.9rem' }}>
-                                                {getDeviceIcon(visitor.userAgent)}
-                                                <span style={{ maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                    {visitor.userAgent || 'Unknown'}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span style={{
-                                                background: 'rgba(139, 111, 71, 0.1)',
-                                                color: '#8B6F47',
-                                                padding: '2px 8px',
-                                                borderRadius: '12px',
-                                                fontSize: '0.85rem',
-                                                fontWeight: '600'
-                                            }}>
-                                                {visitor.visitCount} visits
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                    {filteredVisitors.length > 0 ? (
+                        filteredVisitors.map((visitor) => (
+                            <div
+                                key={visitor.id}
+                                className="list-item-card"
+                                style={{
+                                    borderLeft: '4px solid #10b981'
+                                }}
+                            >
+                                <div style={{ width: '100%' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></div>
+                                            <span style={{ fontWeight: '600', fontSize: '1.1rem' }}>{visitor.ip}</span>
+                                        </div>
+                                        <span style={{
+                                            background: 'rgba(139, 111, 71, 0.1)',
+                                            color: '#8B6F47',
+                                            padding: '2px 8px',
+                                            borderRadius: '12px',
+                                            fontSize: '0.85rem',
+                                            fontWeight: '600'
+                                        }}>
+                                            {visitor.visitCount} visits
+                                        </span>
+                                    </div>
+
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', color: '#666', fontSize: '0.9rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            {getDeviceIcon(visitor.userAgent)}
+                                            <span style={{ wordBreak: 'break-all' }}>
+                                                {visitor.userAgent || 'Unknown'}
                                             </span>
-                                        </td>
-                                        <td className="date-cell">
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                <Clock size={14} />
-                                                {formatDate(visitor.lastVisit)}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="4" className="empty-state">
-                                        No visitors found
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#888' }}>
+                                            <Clock size={16} />
+                                            {formatDate(visitor.lastVisit)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="empty-state" style={{ background: 'white', padding: '3rem', borderRadius: '8px', textAlign: 'center', color: '#888' }}>
+                            No visitors found
+                        </div>
+                    )}
                 </div>
             )}
 

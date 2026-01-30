@@ -113,39 +113,44 @@ const CatalogInquiriesPage = () => {
     const tabs = ['All', 'New', 'Contacted', 'Sold', 'Closed'];
 
     return (
-        <div className="page-container">
-            <div className="page-header">
+        <div className="page-padding">
+            <div className="header-actions">
                 <div>
                     <h1 className="page-title">Catalog Inquiries</h1>
                     <p className="page-subtitle">Track interest in your design catalogs</p>
                 </div>
-            </div>
-
-            {/* Tabs */}
-            <div className="tabs-container">
-                {tabs.map(tab => (
-                    <button
-                        key={tab}
-                        className={`tab-button ${activeTab === tab ? 'active' : ''}`}
-                        onClick={() => setActiveTab(tab)}
-                    >
-                        {tab}
-                        <span className="tab-count">{statusCounts[tab]}</span>
-                    </button>
-                ))}
-            </div>
-
-            <div className="filters-bar">
-                <div className="search-wrapper">
+                <div className="search-wrapper" style={{ minWidth: '250px' }}>
                     <Search size={20} className="search-icon" />
                     <input
                         type="text"
-                        placeholder="Search by name, email, or catalog..."
+                        placeholder="Search..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="search-input"
                     />
                 </div>
+            </div>
+
+            {/* Tabs */}
+            <div className="filter-tabs">
+                {tabs.map(tab => (
+                    <button
+                        key={tab}
+                        className={`tab-button ${activeTab === tab ? 'active' : ''}`}
+                        onClick={() => setActiveTab(tab)}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            background: activeTab === tab ? '#8B6F47' : 'white',
+                            color: activeTab === tab ? 'white' : '#666',
+                            border: '1px solid #ddd',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontWeight: '600'
+                        }}
+                    >
+                        {tab} <span style={{ opacity: 0.8, fontSize: '0.85em', marginLeft: '4px' }}>({statusCounts[tab]})</span>
+                    </button>
+                ))}
             </div>
 
             {loading ? (

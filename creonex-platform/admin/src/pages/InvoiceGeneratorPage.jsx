@@ -276,129 +276,115 @@ const InvoiceGenerator = () => {
 
     // --- Preview Component ---
     const Preview = () => (
-        <div className="preview-container" style={{ padding: '40px', maxWidth: '800px', margin: '0 auto', background: 'white' }}>
+        <div className="invoice-preview" style={{ padding: '40px', maxWidth: '800px', margin: '0 auto', background: 'white', fontFamily: 'sans-serif' }}>
             {/* 1. Header Section */}
-            <div className="flex justify-between items-start mb-12">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '3rem' }}>
                 <div>
-                    <h1 className="text-4xl font-bold text-gray-800 tracking-tight">INVOICE</h1>
-
-                    <div className="mt-8 text-sm">
-                        <div className="flex mb-1">
-                            <span className="font-bold text-gray-500 w-24">Invoice No:</span>
-                            <span className="font-semibold text-gray-900">{invoiceData.invoiceNumber}</span>
+                    <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#1f2937', margin: 0, letterSpacing: '-1px' }}>INVOICE</h1>
+                    <div style={{ marginTop: '2rem', fontSize: '0.875rem' }}>
+                        <div style={{ display: 'flex', marginBottom: '0.25rem' }}>
+                            <span style={{ fontWeight: 'bold', color: '#6b7280', width: '6rem' }}>Invoice No:</span>
+                            <span style={{ fontWeight: '600', color: '#111827' }}>{invoiceData.invoiceNumber}</span>
                         </div>
-                        <div className="flex">
-                            <span className="font-bold text-gray-500 w-24">Date:</span>
-                            <span className="text-gray-900">
+                        <div style={{ display: 'flex' }}>
+                            <span style={{ fontWeight: 'bold', color: '#6b7280', width: '6rem' }}>Date:</span>
+                            <span style={{ color: '#111827' }}>
                                 {new Date(invoiceData.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')}
                             </span>
                         </div>
                     </div>
                 </div>
-
                 {/* Logo Placeholder */}
-                <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-400">
+                <div style={{ width: '4rem', height: '4rem', background: '#f3f4f6', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', color: '#9ca3af' }}>
                     LOGO
                 </div>
             </div>
 
             {/* 2. Addresses Section */}
-            <div className="grid grid-cols-2 gap-12 mb-12">
-                {/* FROM */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', marginBottom: '3rem' }}>
                 <div>
-                    <h3 className="text-xs font-bold text-gray-500 mb-4 uppercase tracking-wider">From:</h3>
-                    <div className="text-gray-900">
-                        <p className="text-lg font-bold text-gray-800">{fromDetails.name}</p>
-                        <p className="text-sm text-gray-500 mb-2">{fromDetails.subtitle}</p>
-                        <p className="text-sm">Email: {fromDetails.email}</p>
-                        <p className="text-sm">Phone: {fromDetails.phone}</p>
+                    <h3 style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#6b7280', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>From:</h3>
+                    <div style={{ color: '#111827' }}>
+                        <p style={{ fontSize: '1.125rem', fontWeight: 'bold', margin: '0 0 0.25rem 0' }}>{fromDetails.name}</p>
+                        <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem', marginTop: 0 }}>{fromDetails.subtitle}</p>
+                        <p style={{ fontSize: '0.875rem', margin: 0 }}>Email: {fromDetails.email}</p>
+                        <p style={{ fontSize: '0.875rem', margin: 0 }}>Phone: {fromDetails.phone}</p>
                     </div>
                 </div>
-
-                {/* BILLED TO */}
                 <div>
-                    <h3 className="text-xs font-bold text-gray-500 mb-4 uppercase tracking-wider">Billed To:</h3>
-                    <div className="text-gray-900">
-                        <p className="text-lg font-bold text-gray-800 mb-1">{invoiceData.billedTo.name || 'Client Name'}</p>
-                        <p className="text-sm text-gray-500 whitespace-pre-line mb-3">{invoiceData.billedTo.address || 'Address'}</p>
-
+                    <h3 style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#6b7280', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Billed To:</h3>
+                    <div style={{ color: '#111827' }}>
+                        <p style={{ fontSize: '1.125rem', fontWeight: 'bold', margin: '0 0 0.25rem 0' }}>{invoiceData.billedTo.name || 'Client Name'}</p>
+                        <p style={{ fontSize: '0.875rem', color: '#6b7280', whiteSpace: 'pre-line', marginBottom: '0.75rem', marginTop: 0 }}>
+                            {invoiceData.billedTo.address || 'Address'}
+                        </p>
                         {invoiceData.billedTo.gstin && (
-                            <p className="text-sm"><span className="font-bold">GSTIN:</span> {invoiceData.billedTo.gstin}</p>
+                            <p style={{ fontSize: '0.875rem', margin: 0 }}><span style={{ fontWeight: 'bold' }}>GSTIN:</span> {invoiceData.billedTo.gstin}</p>
                         )}
                         {invoiceData.billedTo.pan && (
-                            <p className="text-sm"><span className="font-bold">PAN:</span> {invoiceData.billedTo.pan}</p>
+                            <p style={{ fontSize: '0.875rem', margin: 0 }}><span style={{ fontWeight: 'bold' }}>PAN:</span> {invoiceData.billedTo.pan}</p>
                         )}
                     </div>
                 </div>
             </div>
 
             {/* 3. Table */}
-            <div className="mb-8">
-                {/* Header */}
-                <div className="flex border-t border-b border-gray-200 py-2 mb-4">
-                    <div className="w-[50%] text-xs font-bold text-gray-500 uppercase">Description</div>
-                    <div className="w-[15%] text-xs font-bold text-gray-500 uppercase text-left">Quantity</div>
-                    <div className="w-[15%] text-xs font-bold text-gray-500 uppercase text-right">Rate (₹)</div>
-                    <div className="w-[20%] text-xs font-bold text-gray-500 uppercase text-right">Amount (₹)</div>
+            <div style={{ marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', borderTop: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb', padding: '0.5rem 0', marginBottom: '1rem' }}>
+                    <div style={{ width: '50%', fontSize: '0.75rem', fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase' }}>Description</div>
+                    <div style={{ width: '15%', fontSize: '0.75rem', fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', textAlign: 'left' }}>Quantity</div>
+                    <div style={{ width: '15%', fontSize: '0.75rem', fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', textAlign: 'right' }}>Rate (₹)</div>
+                    <div style={{ width: '20%', fontSize: '0.75rem', fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', textAlign: 'right' }}>Amount (₹)</div>
                 </div>
-
-                {/* Rows */}
-                <div className="space-y-4 border-b border-gray-200 pb-8">
+                <div style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '2rem' }}>
                     {invoiceData.items.map((item, i) => (
-                        <div key={i} className="flex text-sm text-gray-900">
-                            <div className="w-[50%] pr-4">{item.description}</div>
-                            <div className="w-[15%] text-left">{item.quantity}</div>
-                            <div className="w-[15%] text-right">{parseFloat(item.rate).toLocaleString('en-IN')}</div>
-                            <div className="w-[20%] text-right font-bold">{parseFloat(item.amount).toLocaleString('en-IN')}</div>
+                        <div key={i} style={{ display: 'flex', fontSize: '0.875rem', color: '#111827', marginBottom: '1rem' }}>
+                            <div style={{ width: '50%', paddingRight: '1rem' }}>{item.description}</div>
+                            <div style={{ width: '15%', textAlign: 'left' }}>{item.quantity}</div>
+                            <div style={{ width: '15%', textAlign: 'right' }}>{parseFloat(item.rate).toLocaleString('en-IN')}</div>
+                            <div style={{ width: '20%', textAlign: 'right', fontWeight: 'bold' }}>{parseFloat(item.amount).toLocaleString('en-IN')}</div>
                         </div>
                     ))}
                 </div>
             </div>
 
             {/* 4. Totals */}
-            <div className="flex justify-end mb-12">
-                <div className="text-right">
-                    <p className="text-sm text-gray-500 mb-1">Total Amount:</p>
-                    <p className="text-3xl font-bold text-gray-800">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '3rem' }}>
+                <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.25rem', marginTop: 0 }}>Total Amount:</p>
+                    <p style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#1f2937', margin: 0 }}>
                         ₹{invoiceData.totalAmount.toLocaleString('en-IN')} /-
                     </p>
-                    {/* Placeholder for words - simplified for preview */}
-                    <p className="text-xs text-gray-500 italic mt-1">(Amount in words will be on PDF)</p>
+                    <p style={{ fontSize: '0.75rem', color: '#9ca3af', fontStyle: 'italic', marginTop: '0.25rem' }}>(Amount in words will be on PDF)</p>
                 </div>
             </div>
 
-            {/* 5. Footer (Payment & Notes) */}
-            <div className="grid grid-cols-2 gap-12 pt-8 border-t border-gray-200">
-                {/* Payment */}
+            {/* 5. Footer */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', paddingTop: '2rem', borderTop: '1px solid #e5e7eb' }}>
                 <div>
-                    <h3 className="text-xs font-bold text-gray-500 mb-4 uppercase tracking-wider">Payment Details</h3>
-                    <div className="text-sm text-gray-800 space-y-1">
-                        <p><span className="font-bold">Account Name:</span> {paymentDetails.accountName}</p>
-                        <p><span className="font-bold">Bank Name:</span> {paymentDetails.bankName}</p>
-                        <p><span className="font-bold">Account Number:</span> {paymentDetails.accountNumber}</p>
-                        <p><span className="font-bold">IFSC Code:</span> {paymentDetails.ifsc}</p>
+                    <h3 style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#6b7280', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Payment Details</h3>
+                    <div style={{ fontSize: '0.875rem', color: '#1f2937', lineHeight: '1.5' }}>
+                        <p style={{ margin: 0 }}><span style={{ fontWeight: 'bold' }}>Account Name:</span> {paymentDetails.accountName}</p>
+                        <p style={{ margin: 0 }}><span style={{ fontWeight: 'bold' }}>Bank Name:</span> {paymentDetails.bankName}</p>
+                        <p style={{ margin: 0 }}><span style={{ fontWeight: 'bold' }}>Account Number:</span> {paymentDetails.accountNumber}</p>
+                        <p style={{ margin: 0 }}><span style={{ fontWeight: 'bold' }}>IFSC Code:</span> {paymentDetails.ifsc}</p>
                     </div>
                 </div>
-
-                {/* Notes */}
                 <div>
-                    <h3 className="text-xs font-bold text-gray-500 mb-4 uppercase tracking-wider">Notes</h3>
-                    <ul className="text-sm text-gray-500 space-y-2 list-disc list-inside">
+                    <h3 style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#6b7280', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Notes</h3>
+                    <ul style={{ fontSize: '0.875rem', color: '#6b7280', lineHeight: '1.5', paddingLeft: '1rem', margin: 0 }}>
                         <li>Services include AI-generated images and video visuals for digital presentation only.</li>
                         <li>No physical products or printing involved.</li>
                         <li>This invoice is generated for creative and digital services rendered.</li>
                     </ul>
                 </div>
             </div>
-
-            <div className="mt-12 text-center text-xs text-gray-300">
-                Generated by Creonex Platform
-            </div>
+            <div style={{ marginTop: '3rem', textAlign: 'center', fontSize: '0.75rem', color: '#d1d5db' }}>Generated by Creonex Platform</div>
         </div>
     );
 
     return (
-        <div className="invoice-page">
+        <div className="invoice-page page-padding">
             <div className="invoice-header">
                 <div className="header-title">
                     <h1>Invoice Generator</h1>
@@ -496,7 +482,7 @@ const InvoiceGenerator = () => {
             )}
 
             {previewMode ? (
-                <div className="animate-fade-in">
+                <div className="animate-fade-in" style={{ overflowX: 'auto' }}>
                     <Preview />
                 </div>
             ) : (
@@ -674,85 +660,93 @@ const InvoiceGenerator = () => {
                             </div>
                         </div>
 
-                        {/* Filtered History Table */}
-                        <div className="history-table-wrapper" style={{
-                            background: 'white',
-                            borderRadius: '12px',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                            overflow: 'hidden',
-                            border: '1px solid var(--border-color)'
-                        }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                                <thead style={{ background: '#f8f9fa', borderBottom: '1px solid var(--border-color)' }}>
-                                    <tr>
-                                        <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: 'var(--text-secondary)' }}>Date</th>
-                                        <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: 'var(--text-secondary)' }}>Invoice No</th>
-                                        <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: 'var(--text-secondary)' }}>Client</th>
-                                        <th style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: 'var(--text-secondary)' }}>Amount</th>
-                                        <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: 'var(--text-secondary)' }}>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredHistory.length === 0 ? (
-                                        <tr>
-                                            <td colSpan="5" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                                                <p>No invoices found for this period.</p>
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        filteredHistory.map(inv => (
-                                            <tr key={inv._id} style={{ borderBottom: '1px solid var(--border-color)', transition: 'background 0.2s' }} className="hover:bg-gray-50">
-                                                <td style={{ padding: '1rem', color: 'var(--text-primary)' }}>
-                                                    {new Date(inv.date || inv.createdAt).toLocaleDateString()}
-                                                </td>
-                                                <td style={{ padding: '1rem', fontWeight: '500', color: 'var(--text-primary)' }}>
-                                                    {inv.invoiceNumber}
-                                                </td>
-                                                <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>
-                                                    {inv.billedTo?.name}
-                                                </td>
-                                                <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '600', color: 'var(--text-primary)' }}>
-                                                    ₹{parseFloat(inv.totalAmount)?.toLocaleString('en-IN')}
-                                                </td>
-                                                <td style={{ padding: '1rem', textAlign: 'center' }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
-                                                        <button
-                                                            onClick={() => handleDownloadPDF(inv._id, inv.invoiceNumber)}
-                                                            style={{
-                                                                background: 'none',
-                                                                border: 'none',
-                                                                color: 'var(--primary-color)',
-                                                                cursor: 'pointer',
-                                                                padding: '0.5rem',
-                                                                borderRadius: '50%'
-                                                            }}
-                                                            title="Download PDF"
-                                                            className="hover:bg-gray-100"
-                                                        >
-                                                            <Download size={18} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDeleteInvoice(inv._id)}
-                                                            style={{
-                                                                background: 'none',
-                                                                border: 'none',
-                                                                color: '#ef4444',
-                                                                cursor: 'pointer',
-                                                                padding: '0.5rem',
-                                                                borderRadius: '50%'
-                                                            }}
-                                                            title="Delete Invoice"
-                                                            className="hover:bg-red-50"
-                                                        >
-                                                            <Trash2 size={18} />
-                                                        </button>
+                        {/* Filtered History List */}
+                        <div style={{ display: 'grid', gap: '1rem' }}>
+                            {filteredHistory.length === 0 ? (
+                                <div style={{
+                                    background: 'white',
+                                    padding: '3rem',
+                                    borderRadius: '12px',
+                                    textAlign: 'center',
+                                    color: 'var(--text-muted)',
+                                    border: '1px solid var(--border-color)'
+                                }}>
+                                    <p>No invoices found for this period.</p>
+                                </div>
+                            ) : (
+                                filteredHistory.map(inv => (
+                                    <div
+                                        key={inv._id}
+                                        className="list-item-card"
+                                        style={{
+                                            borderLeft: '4px solid var(--primary-color)'
+                                        }}
+                                    >
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                                <div>
+                                                    <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: 'var(--text-primary)', margin: 0 }}>
+                                                        {inv.billedTo?.name || 'Unknown Client'}
+                                                    </h3>
+                                                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+                                                        {inv.invoiceNumber}
+                                                    </p>
+                                                </div>
+                                                <div style={{ textAlign: 'right' }}>
+                                                    <span style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--primary-color)' }}>
+                                                        ₹{parseFloat(inv.totalAmount)?.toLocaleString('en-IN')}
+                                                    </span>
+                                                    <div style={{ fontSize: '0.8rem', color: '#888', marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem', justifyContent: 'flex-end' }}>
+                                                        <FileText size={12} />
+                                                        {new Date(inv.date || inv.createdAt).toLocaleDateString()}
                                                     </div>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="list-item-actions">
+                                            <button
+                                                onClick={() => handleDownloadPDF(inv._id, inv.invoiceNumber)}
+                                                style={{
+                                                    padding: '0.5rem',
+                                                    background: '#e0f2fe',
+                                                    color: '#0284c7',
+                                                    border: 'none',
+                                                    borderRadius: '6px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '0.5rem'
+                                                }}
+                                                title="Download PDF"
+                                            >
+                                                <Download size={18} />
+                                                <span className="mobile-only-text" style={{ fontSize: '0.85rem' }}>Download</span>
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteInvoice(inv._id)}
+                                                style={{
+                                                    padding: '0.5rem',
+                                                    background: '#fee2e2',
+                                                    color: '#dc2626',
+                                                    border: 'none',
+                                                    borderRadius: '6px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '0.5rem'
+                                                }}
+                                                title="Delete Invoice"
+                                            >
+                                                <Trash2 size={18} />
+                                                <span className="mobile-only-text" style={{ fontSize: '0.85rem' }}>Delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
                 )

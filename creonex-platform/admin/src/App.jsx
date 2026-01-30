@@ -29,6 +29,8 @@ const RequireAuth = () => {
 
 import { ToastProvider } from './contexts/ToastContext';
 
+import SettingsPage from './pages/SettingsPage';
+
 function App() {
   return (
     <ToastProvider>
@@ -52,7 +54,7 @@ function App() {
                 <Route path="links" element={<LinksPage />} />
                 <Route path="users" element={<div>Users Page</div>} />
                 <Route path="invoices" element={<InvoiceGeneratorPage />} />
-                <Route path="settings" element={<div>Settings Page</div>} />
+                <Route path="settings" element={<SettingsPage />} />
               </Route>
             </Route>
           </Routes>
