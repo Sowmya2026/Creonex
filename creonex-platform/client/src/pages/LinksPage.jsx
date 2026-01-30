@@ -120,7 +120,6 @@ const LinksPage = () => {
                                 </div>
                                 <div className="link-details">
                                     <h3 className="link-title">{link.title}</h3>
-                                    <h3 className="link-title">{link.title}</h3>
                                     {link.description && <p className="link-desc">{link.description}</p>}
                                     <div className="link-footer">
                                         {link.price && <span className="link-price">{link.price}</span>}
