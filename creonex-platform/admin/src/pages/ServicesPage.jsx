@@ -6,9 +6,19 @@ import { useToast } from '../contexts/ToastContext';
 
 const getImageUrl = (url) => {
     if (!url) return '';
-    if (url.startsWith('http') || url.startsWith('data:')) return url;
-    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+    // Get the configured API base URL
+    const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
     const serverUrl = apiBase.replace(/\/api\/?$/, '');
+
+    if (url.startsWith('http') || url.startsWith('data:')) {
+        // Replace localhost with production server if needed
+        if (!serverUrl.includes('localhost') && url.includes('localhost:5000')) {
+            return url.replace('http://localhost:5000', serverUrl);
+        }
+        return url;
+    }
+
     return `${serverUrl}${url}`;
 };
 

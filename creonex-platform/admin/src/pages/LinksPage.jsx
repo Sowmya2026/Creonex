@@ -3,6 +3,20 @@ import { Plus, Edit2, Trash2, Save, X, Loader, Image as ImageIcon, ExternalLink,
 import api from '../services/api';
 import { useToast } from '../contexts/ToastContext';
 
+const getImageUrl = (url) => {
+    if (!url) return '';
+    const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
+    const serverUrl = apiBase.replace(/\/api\/?$/, '');
+
+    if (url.startsWith('http') || url.startsWith('data:')) {
+        if (!serverUrl.includes('localhost') && url.includes('localhost:5000')) {
+            return url.replace('http://localhost:5000', serverUrl);
+        }
+        return url;
+    }
+    return `${serverUrl}${url}`;
+};
+
 const LinksPage = () => {
     const { showSuccess, showError } = useToast();
     const [items, setItems] = useState([]);
@@ -482,11 +496,7 @@ const LinksPage = () => {
                                 {imagePreview && (
                                     <div style={{ position: 'relative', width: '150px', height: '150px' }}>
                                         <img
-                                            src={
-                                                imagePreview.startsWith('data:') || imagePreview.startsWith('http')
-                                                    ? imagePreview
-                                                    : (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '') + imagePreview
-                                            }
+                                            src={getImageUrl(imagePreview)}
                                             alt="Preview"
                                             style={{
                                                 width: '100%',
@@ -683,7 +693,7 @@ const LinksPage = () => {
                         }}>
                             {item.imageUrl ? (
                                 <img
-                                    src={item.imageUrl.startsWith('http') ? item.imageUrl : (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '') + item.imageUrl}
+                                    src={getImageUrl(item.imageUrl)}
                                     alt={item.title}
                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                     onError={(e) => {

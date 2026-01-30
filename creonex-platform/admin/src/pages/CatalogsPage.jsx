@@ -20,6 +20,20 @@ import {
 } from 'lucide-react';
 import './CatalogsPage.css';
 
+const getImageUrl = (url) => {
+    if (!url) return '';
+    const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
+    const serverUrl = apiBase.replace(/\/api\/?$/, '');
+
+    if (url.startsWith('http') || url.startsWith('data:')) {
+        if (!serverUrl.includes('localhost') && url.includes('localhost:5000')) {
+            return url.replace('http://localhost:5000', serverUrl);
+        }
+        return url;
+    }
+    return `${serverUrl}${url}`;
+};
+
 const CatalogsPage = () => {
     const { showSuccess, showError } = useToast();
     const [catalogs, setCatalogs] = useState([]);
@@ -294,7 +308,7 @@ const CatalogsPage = () => {
                             <div key={item.id} className={`card ${!item.isActive ? 'opacity-75' : ''}`}>
                                 <div className="card-image-wrapper">
                                     <img
-                                        src={api.getUri() + item.coverImageUrl}
+                                        src={getImageUrl(item.coverImageUrl)}
                                         alt={item.title}
                                         className="card-image"
                                         onError={(e) => e.target.src = 'https://placehold.co/600x400?text=Cover+Image'}

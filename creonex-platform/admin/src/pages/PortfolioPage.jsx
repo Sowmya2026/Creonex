@@ -6,11 +6,23 @@ import { useToast } from '../contexts/ToastContext';
 
 const getImageUrl = (url) => {
     if (!url) return '';
-    if (url.startsWith('http') || url.startsWith('data:')) return url;
 
-    // Prepend API URL (stripping /api if present)
-    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    // Get the configured API base URL (e.g. https://creonex.onrender.com)
+    // Remove /api suffix if present to get the root server URL
+    const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
     const serverUrl = apiBase.replace(/\/api\/?$/, '');
+
+    // If the URL is already absolute
+    if (url.startsWith('http') || url.startsWith('data:')) {
+        // If we are in a deployed environment (serverUrl is not localhost)
+        // and the image URL points to localhost, rewrite it to use the production server
+        if (!serverUrl.includes('localhost') && url.includes('localhost:5000')) {
+            return url.replace('http://localhost:5000', serverUrl);
+        }
+        return url;
+    }
+
+    // If relative, prepend server URL
     return `${serverUrl}${url}`;
 };
 
