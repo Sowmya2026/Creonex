@@ -3,15 +3,17 @@ import { Plus, Edit2, Trash2, Save, X, Loader, Power, FileUp, CheckCircle, XCirc
 import ImportModal from '../components/ImportModal';
 import api from '../services/api';
 import { useToast } from '../contexts/ToastContext';
+import { compressImage } from '../utils/imageCompressor';
 
 const getImageUrl = (url) => {
     if (!url) return '';
+    if (url.startsWith('data:')) return url;
 
     // Get the configured API base URL
     const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
     const serverUrl = apiBase.replace(/\/api\/?$/, '');
 
-    if (url.startsWith('http') || url.startsWith('data:')) {
+    if (url.startsWith('http')) {
         // Replace localhost with production server if needed
         if (!serverUrl.includes('localhost') && url.includes('localhost:5000')) {
             return url.replace('http://localhost:5000', serverUrl);
@@ -109,26 +111,21 @@ const ServicesPage = () => {
 
         setUploading(true);
         try {
-            const formDataUpload = new FormData();
-            formDataUpload.append('folder', 'services'); // Important: Append folder BEFORE image
-            formDataUpload.append('image', imageFile);
-
-            const response = await api.post('/upload/image', formDataUpload, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+            // COMPRESS AND CONVERT TO BASE64 FOR FIRESTORE
+            const base64Image = await compressImage(imageFile, {
+                maxWidth: 600,
+                maxHeight: 600,
+                quality: 0.7
             });
-
-            if (response.data.success) {
-                return response.data.data.url;
-            }
-            throw new Error(response.data.message || 'Upload failed');
+            return base64Image;
         } catch (error) {
-            console.error('Image upload failed:', error);
-            throw error;
+            console.error('Image processing failed:', error);
+            showError('Failed to process image');
+            return null;
         } finally {
             setUploading(false);
         }
     };
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -798,29 +795,30 @@ const ServicesPage = () => {
                                             border: 'none',
                                             borderRadius: '4px',
                                             cursor: 'pointer',
+                                            fontSize: '0.75rem',
                                             fontWeight: '600',
-                                            fontSize: '0.85rem',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             gap: '0.25rem'
                                         }}
                                     >
-                                        <Power size={14} />
-                                        {service.isActive === false ? 'Inactive' : 'Active'}
+                                        {service.isActive === false ? (
+                                            <><Power size={14} /> Enable</>
+                                        ) : (
+                                            <><Power size={14} /> Disable</>
+                                        )}
                                     </button>
                                     <button
                                         onClick={() => handleEdit(service)}
                                         style={{
                                             padding: '0.5rem',
-                                            background: '#f8f9fa',
-                                            color: '#444',
-                                            border: '1px solid #dee2e6',
+                                            background: '#f5f5f5',
+                                            border: '1px solid #ddd',
                                             borderRadius: '4px',
-                                            cursor: 'pointer'
+                                            cursor: 'pointer',
+                                            color: '#666'
                                         }}
-                                        title="Edit"
-                                        aria-label="Edit"
                                     >
                                         <Edit2 size={16} />
                                     </button>
@@ -828,14 +826,12 @@ const ServicesPage = () => {
                                         onClick={() => handleDeleteClick(service.id)}
                                         style={{
                                             padding: '0.5rem',
-                                            background: '#fff5f5',
-                                            color: '#c53030',
-                                            border: '1px solid #fed7d7',
+                                            background: '#fef2f2',
+                                            border: '1px solid #fecaca',
                                             borderRadius: '4px',
-                                            cursor: 'pointer'
+                                            cursor: 'pointer',
+                                            color: '#dc2626'
                                         }}
-                                        title="Delete"
-                                        aria-label="Delete"
                                     >
                                         <Trash2 size={16} />
                                     </button>
@@ -846,6 +842,7 @@ const ServicesPage = () => {
                 })()}
             </div>
 
+            {/* Delete Confirmation Modal */}
             {showDeleteConfirm && (
                 <div style={{
                     position: 'fixed',
@@ -863,20 +860,22 @@ const ServicesPage = () => {
                         background: 'white',
                         padding: '2rem',
                         borderRadius: '8px',
+                        width: '90%',
                         maxWidth: '400px',
-                        width: '90%'
+                        textAlign: 'center'
                     }}>
-                        <h3 style={{ marginBottom: '1rem', fontSize: '1.25rem' }}>Confirm Delete</h3>
+                        <h3 style={{ marginBottom: '1rem', color: '#1a1a1a' }}>Confirm Delete</h3>
                         <p style={{ marginBottom: '1.5rem', color: '#666' }}>
                             Are you sure you want to delete this service? This action cannot be undone.
                         </p>
-                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                             <button
                                 onClick={() => setShowDeleteConfirm(null)}
                                 style={{
                                     padding: '0.75rem 1.5rem',
                                     background: '#f5f5f5',
-                                    border: '1px solid #ddd',
+                                    color: '#333',
+                                    border: 'none',
                                     borderRadius: '6px',
                                     cursor: 'pointer',
                                     fontWeight: '600'
@@ -901,16 +900,14 @@ const ServicesPage = () => {
                         </div>
                     </div>
                 </div>
-            )
-            }
+            )}
 
-            < ImportModal
+            <ImportModal
                 isOpen={showImportModal}
                 onClose={() => setShowImportModal(false)}
                 onImport={handleImportData}
-                type="Services"
             />
-        </div >
+        </div>
     );
 };
 

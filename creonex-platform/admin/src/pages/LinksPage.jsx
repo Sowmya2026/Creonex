@@ -2,13 +2,16 @@ import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit2, Trash2, Save, X, Loader, Image as ImageIcon, ExternalLink, Link as LinkIcon, Upload, Wand2, Eye, EyeOff, CheckCircle, XCircle, Star } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../contexts/ToastContext';
+import { compressImage } from '../utils/imageCompressor';
 
 const getImageUrl = (url) => {
     if (!url) return '';
+    if (url.startsWith('data:')) return url;
+
     const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
     const serverUrl = apiBase.replace(/\/api\/?$/, '');
 
-    if (url.startsWith('http') || url.startsWith('data:')) {
+    if (url.startsWith('http')) {
         if (!serverUrl.includes('localhost') && url.includes('localhost:5000')) {
             return url.replace('http://localhost:5000', serverUrl);
         }
@@ -100,24 +103,17 @@ const LinksPage = () => {
 
         setUploading(true);
         try {
-            const formDataUpload = new FormData();
-            // Important: 'folder' must be appended BEFORE 'image' for Multer to read it in time
-            formDataUpload.append('folder', 'links');
-            formDataUpload.append('image', imageFile);
-
-            const response = await api.post('/upload/image', formDataUpload, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+            // COMPRESS AND CONVERT TO BASE64 FOR FIRESTORE
+            const base64Image = await compressImage(imageFile, {
+                maxWidth: 600,
+                maxHeight: 600,
+                quality: 0.7
             });
-
-            if (response.data.success) {
-                // Return relative path (e.g., /uploads/links/filename.jpg)
-                return response.data.data.url;
-            } else {
-                throw new Error(response.data.message || 'Upload failed');
-            }
+            return base64Image;
         } catch (error) {
-            console.error('Image upload failed:', error);
-            throw error;
+            console.error('Image processing failed:', error);
+            showError('Failed to process image');
+            return null;
         } finally {
             setUploading(false);
         }
@@ -188,7 +184,7 @@ const LinksPage = () => {
                 if (uploadedUrl) {
                     imageUrl = uploadedUrl;
                 } else {
-                    throw new Error('Failed to upload image');
+                    throw new Error('Failed to process image');
                 }
             }
 
@@ -309,7 +305,7 @@ const LinksPage = () => {
                             gap: '0.5rem',
                             padding: '0.75rem 1.5rem',
                             background: '#f5f5f5',
-                            color: '#333',
+                            color: 'white',
                             border: '1px solid #ddd',
                             borderRadius: '6px',
                             cursor: 'pointer',
@@ -600,7 +596,7 @@ const LinksPage = () => {
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: '6px',
-                                    cursor: submitting ? 'not-allowed' : 'pointer',
+                                    cursor: 'pointer',
                                     fontWeight: '600'
                                 }}
                             >
@@ -798,7 +794,6 @@ const LinksPage = () => {
                                             cursor: 'pointer',
                                             color: '#666'
                                         }}
-                                        title="Edit"
                                     >
                                         <Edit2 size={16} />
                                     </button>
@@ -807,12 +802,11 @@ const LinksPage = () => {
                                         style={{
                                             padding: '0.5rem',
                                             background: 'transparent',
-                                            border: '1px solid #feebc8',
+                                            border: '1px solid #ddd',
                                             borderRadius: '4px',
                                             cursor: 'pointer',
-                                            color: '#c05621'
+                                            color: '#dc2626'
                                         }}
-                                        title="Delete"
                                     >
                                         <Trash2 size={16} />
                                     </button>
@@ -823,12 +817,7 @@ const LinksPage = () => {
                 ))}
             </div>
 
-            {items.length === 0 && !loading && (
-                <div style={{ textAlign: 'center', padding: '3rem', color: '#666' }}>
-                    <p>No links added yet. Click "Add Link" to get started.</p>
-                </div>
-            )}
-
+            {/* Delete Confirmation Modal */}
             {showDeleteConfirm && (
                 <div style={{
                     position: 'fixed',
@@ -846,17 +835,21 @@ const LinksPage = () => {
                         background: 'white',
                         padding: '2rem',
                         borderRadius: '8px',
+                        width: '90%',
                         maxWidth: '400px',
-                        width: '90%'
+                        textAlign: 'center'
                     }}>
-                        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Confirm Delete</h3>
-                        <p style={{ marginBottom: '1.5rem', color: '#666' }}>Are you sure you want to delete this link? This action cannot be undone.</p>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                        <h3 style={{ marginBottom: '1rem', color: '#1a1a1a' }}>Confirm Delete</h3>
+                        <p style={{ marginBottom: '1.5rem', color: '#666' }}>
+                            Are you sure you want to delete this link? This action cannot be undone.
+                        </p>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                             <button
                                 onClick={() => setShowDeleteConfirm(null)}
                                 style={{
                                     padding: '0.75rem 1.5rem',
                                     background: '#f5f5f5',
+                                    color: '#333',
                                     border: 'none',
                                     borderRadius: '6px',
                                     cursor: 'pointer',
@@ -869,7 +862,7 @@ const LinksPage = () => {
                                 onClick={handleDeleteConfirm}
                                 style={{
                                     padding: '0.75rem 1.5rem',
-                                    background: '#e53e3e',
+                                    background: '#dc2626',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: '6px',

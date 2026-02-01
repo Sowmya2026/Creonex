@@ -3,9 +3,11 @@ import { Plus, Edit2, Trash2, Save, X, Loader, Image as ImageIcon, Star, Eye, Ey
 import ImportModal from '../components/ImportModal';
 import api from '../services/api';
 import { useToast } from '../contexts/ToastContext';
+import { compressImage } from '../utils/imageCompressor';
 
 const getImageUrl = (url) => {
     if (!url) return '';
+    if (url.startsWith('data:')) return url;
 
     // Get the configured API base URL (e.g. https://creonex.onrender.com)
     // Remove /api suffix if present to get the root server URL
@@ -13,7 +15,7 @@ const getImageUrl = (url) => {
     const serverUrl = apiBase.replace(/\/api\/?$/, '');
 
     // If the URL is already absolute
-    if (url.startsWith('http') || url.startsWith('data:')) {
+    if (url.startsWith('http')) {
         // If we are in a deployed environment (serverUrl is not localhost)
         // and the image URL points to localhost, rewrite it to use the production server
         if (!serverUrl.includes('localhost') && url.includes('localhost:5000')) {
@@ -132,27 +134,22 @@ const PortfolioPage = () => {
 
         setUploading(true);
         try {
-            const uploadPromises = imageFiles.map(file => {
-                const formDataUpload = new FormData();
-                formDataUpload.append('image', file);
-                formDataUpload.append('folder', 'portfolio');
-                return api.post('/upload/image', formDataUpload, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
-            });
+            // COMPRESS AND CONVERT TO BASE64 FOR FIRESTORE
+            const uploadPromises = imageFiles.map(file =>
+                compressImage(file, {
+                    maxWidth: 800,
+                    maxHeight: 800,
+                    quality: 0.7
+                })
+            );
 
-            const responses = await Promise.all(uploadPromises);
-
-            return responses.map(response => {
-                if (response.data.success) {
-                    return response.data.data.url;
-                }
-                throw new Error(response.data.message || 'Upload failed');
-            });
+            const base64Images = await Promise.all(uploadPromises);
+            return base64Images;
 
         } catch (error) {
-            console.error('Image upload failed:', error);
-            throw error;
+            console.error('Image processing failed:', error);
+            showError('Failed to process one or more images');
+            return null;
         } finally {
             setUploading(false);
         }
@@ -165,13 +162,13 @@ const PortfolioPage = () => {
         try {
             let finalImages = [...formData.images]; // Start with existing images
 
-            // If new image files are selected, upload them
+            // If new image files are selected, process them
             if (imageFiles.length > 0) {
-                const newImageUrls = await handleImageUpload();
-                if (!newImageUrls) {
-                    throw new Error('Failed to upload images');
+                const newImageBase64s = await handleImageUpload();
+                if (!newImageBase64s) {
+                    throw new Error('Failed to process images');
                 }
-                finalImages = [...finalImages, ...newImageUrls];
+                finalImages = [...finalImages, ...newImageBase64s];
             }
 
             // Validate that we have at least one image if not a reel
@@ -570,7 +567,7 @@ const PortfolioPage = () => {
                                 {uploading && (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#8B6F47' }}>
                                         <Loader className="spin" size={18} />
-                                        <span>Uploading...</span>
+                                        <span>Process...</span>
                                     </div>
                                 )}
                             </div>
@@ -829,334 +826,268 @@ const PortfolioPage = () => {
                 </button>
             </div>
 
-            {/* Portfolio Grid */}
-            {
-                (() => {
-                    const filteredItems = items.filter(item => {
-                        if (statusFilter === 'active') return item.isActive !== false;
-                        if (statusFilter === 'inactive') return item.isActive === false;
-                        return true; // 'all'
-                    });
-
-                    return (
-                        <div className="portfolio-grid">
-                            {filteredItems.length === 0 ? (
-                                <div style={{
-                                    gridColumn: '1 / -1',
-                                    background: 'white',
-                                    padding: '3rem',
-                                    borderRadius: '8px',
-                                    textAlign: 'center',
-                                    color: '#666'
-                                }}>
-                                    {statusFilter === 'all'
-                                        ? 'No portfolio items yet. Click "Add Portfolio Item" to create one.'
-                                        : statusFilter === 'active'
-                                            ? 'No active portfolio items. Activate some items to show them on the client page.'
-                                            : 'No inactive portfolio items.'}
-                                </div>
+            {/* Portfolio Grid - Replaced CLASS with INLINE GRID STYLES */}
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                gap: '1.5rem',
+                marginBottom: '2rem'
+            }}>
+                {items.filter(item => {
+                    if (statusFilter === 'active') return item.isActive !== false;
+                    if (statusFilter === 'inactive') return item.isActive === false;
+                    return true;
+                }).map(item => (
+                    <div key={item.id} style={{
+                        background: 'white',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        opacity: item.isActive === false ? 0.7 : 1
+                    }}>
+                        {/* Image Wrapper */}
+                        <div style={{
+                            position: 'relative',
+                            height: '240px',
+                            background: '#f5f5f5',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            overflow: 'hidden'
+                        }}>
+                            {item.imageUrl ? (
+                                <img
+                                    src={getImageUrl(item.imageUrl)}
+                                    alt={item.title}
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'cover'
+                                    }}
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = 'https://placehold.co/600x400?text=No+Image';
+                                    }}
+                                />
                             ) : (
-                                filteredItems.map(item => (
-                                    <div
-                                        key={item.id}
-                                        style={{
-                                            background: 'white',
-                                            borderRadius: '8px',
-                                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                            overflow: 'hidden',
-                                            position: 'relative'
-                                        }}
-                                    >
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: '0.5rem',
-                                            right: '0.5rem',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            gap: '0.5rem',
-                                            alignItems: 'flex-end',
-                                            zIndex: 1
-                                        }}>
-                                            {item.isFeatured && (
-                                                <div style={{
-                                                    background: '#FFD700',
-                                                    color: '#333',
-                                                    padding: '0.25rem 0.5rem',
-                                                    borderRadius: '4px',
-                                                    fontSize: '0.75rem',
-                                                    fontWeight: '600',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '0.25rem',
-                                                    boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                                                }}>
-                                                    <Star size={12} fill="currentColor" />
-                                                    Featured
-                                                </div>
-                                            )}
-                                            {item.reelLink && (
-                                                <div style={{
-                                                    background: 'rgba(255, 255, 255, 0.9)',
-                                                    backdropFilter: 'blur(4px)',
-                                                    color: '#E1306C', // Instagram color
-                                                    padding: '0.25rem 0.5rem',
-                                                    borderRadius: '4px',
-                                                    fontSize: '0.75rem',
-                                                    fontWeight: '600',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '0.25rem',
-                                                    boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                                                }}>
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                                                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                                                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                                                    </svg>
-                                                    Reel
-                                                </div>
-                                            )}
-                                            {item.viewsCount > 0 && (
-                                                <div style={{
-                                                    background: 'rgba(0, 0, 0, 0.7)',
-                                                    color: 'white',
-                                                    padding: '0.25rem 0.5rem',
-                                                    borderRadius: '4px',
-                                                    fontSize: '0.75rem',
-                                                    fontWeight: '600',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '0.25rem',
-                                                    boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                                                }}>
-                                                    <Eye size={12} />
-                                                    {item.viewsCount}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div style={{
-                                            width: '100%',
-                                            height: '200px',
-                                            background: '#f5f5f5',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            overflow: 'hidden'
-                                        }}>
-                                            {item.imageUrl ? (
-                                                <img
-                                                    src={getImageUrl(item.imageUrl)}
-                                                    alt={item.title}
-                                                    style={{
-                                                        width: '100%',
-                                                        height: '100%',
-                                                        objectFit: 'cover'
-                                                    }}
-                                                    onError={(e) => {
-                                                        e.target.style.display = 'none';
-                                                        e.target.parentElement.innerHTML = '<div style="color: #999;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>';
-                                                    }}
-                                                />
-                                            ) : (
-                                                <div style={{
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    height: '100%',
-                                                    color: '#ccc',
-                                                    gap: '0.5rem'
-                                                }}>
-                                                    {item.reelLink ? <Video size={48} /> : <ImageIcon size={48} />}
-                                                    {item.reelLink && <span style={{ fontSize: '0.75rem' }}>Reel Video</span>}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div style={{ padding: '1rem' }}>
-                                            <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.5rem' }}>{item.title}</h3>
-                                            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
-                                                <span style={{
-                                                    padding: '0.25rem 0.5rem',
-                                                    background: '#f5f5f5',
-                                                    borderRadius: '4px',
-                                                    fontSize: '0.75rem',
-                                                    color: '#666',
-                                                    textTransform: 'capitalize'
-                                                }}>
-                                                    {item.category === 'catalog' ? 'Other Services we provide' : item.category}
-                                                </span>
-                                                {item.tags && item.tags.length > 0 && item.tags.slice(0, 2).map((tag, idx) => (
-                                                    <span key={idx} style={{
-                                                        padding: '0.25rem 0.5rem',
-                                                        background: '#e8f5e9',
-                                                        borderRadius: '4px',
-                                                        fontSize: '0.75rem',
-                                                        color: '#2e7d32'
-                                                    }}>
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                            {item.description && (
-                                                <p style={{
-                                                    color: '#666',
-                                                    fontSize: '0.875rem',
-                                                    marginBottom: '1rem',
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    display: '-webkit-box',
-                                                    WebkitLineClamp: 2,
-                                                    WebkitBoxOrient: 'vertical'
-                                                }}>
-                                                    {item.description}
-                                                </p>
-                                            )}
-                                            {/* Status indicator */}
-                                            <div style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'space-between',
-                                                marginBottom: '0.75rem',
-                                                padding: '0.5rem',
-                                                background: item.isActive !== false ? '#ecfdf5' : '#fef2f2',
-                                                borderRadius: '6px'
-                                            }}>
-                                                <span style={{
-                                                    fontSize: '0.75rem',
-                                                    fontWeight: '600',
-                                                    color: item.isActive !== false ? '#059669' : '#dc2626'
-                                                }}>
-                                                    {item.isActive !== false ? '● Active' : '○ Inactive'}
-                                                </span>
-                                                <button
-                                                    onClick={() => handleToggleActive(item)}
-                                                    style={{
-                                                        padding: '0.35rem 0.75rem',
-                                                        background: item.isActive !== false ? '#dc2626' : '#059669',
-                                                        color: 'white',
-                                                        border: 'none',
-                                                        borderRadius: '4px',
-                                                        cursor: 'pointer',
-                                                        fontSize: '0.7rem',
-                                                        fontWeight: '600',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '0.25rem'
-                                                    }}
-                                                >
-                                                    {item.isActive !== false ? (
-                                                        <><EyeOff size={12} /> Deactivate</>
-                                                    ) : (
-                                                        <><Eye size={12} /> Activate</>
-                                                    )}
-                                                </button>
-                                            </div>
-                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                                                <button
-                                                    onClick={() => handleEdit(item)}
-                                                    style={{
-                                                        padding: '0.5rem',
-                                                        background: '#f5f5f5',
-                                                        border: 'none',
-                                                        borderRadius: '4px',
-                                                        cursor: 'pointer',
-                                                        color: '#8B6F47'
-                                                    }}
-                                                    title="Edit"
-                                                >
-                                                    <Edit2 size={16} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeleteClick(item.id)}
-                                                    style={{
-                                                        padding: '0.5rem',
-                                                        background: '#fee2e2',
-                                                        border: 'none',
-                                                        borderRadius: '4px',
-                                                        cursor: 'pointer',
-                                                        color: '#dc2626'
-                                                    }}
-                                                    title="Delete"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
+                                <div style={{
+                                    height: '100%',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    background: '#f0f0f0',
+                                    color: '#ccc'
+                                }}>
+                                    {item.reelLink ? <Video size={48} /> : <ImageIcon size={48} />}
+                                    <span style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>
+                                        {item.reelLink ? 'Video Reel' : 'No Image'}
+                                    </span>
+                                </div>
+                            )}
+
+                            {item.isFeatured && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '10px',
+                                    left: '10px',
+                                    background: 'rgba(255, 215, 0, 0.9)',
+                                    color: '#333',
+                                    padding: '0.25rem 0.5rem',
+                                    borderRadius: '4px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: '600',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.25rem',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                }} title="Featured on Homepage">
+                                    <Star size={12} fill="#333" />
+                                    Featured
+                                </div>
+                            )}
+                            {item.isActive === false && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '10px',
+                                    right: '10px',
+                                    background: 'rgba(220, 38, 38, 0.9)',
+                                    color: 'white',
+                                    padding: '0.25rem 0.5rem',
+                                    borderRadius: '4px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: '600'
+                                }}>
+                                    Inactive
+                                </div>
+                            )}
+                            {item.reelLink && (
+                                <div style={{
+                                    position: 'absolute',
+                                    bottom: '10px',
+                                    right: '10px',
+                                    background: 'rgba(0,0,0,0.6)',
+                                    color: 'white',
+                                    padding: '6px',
+                                    borderRadius: '50%'
+                                }}>
+                                    <Video size={20} />
+                                </div>
                             )}
                         </div>
-                    );
-                })()
-            }
 
-            {/* Delete Confirmation Modal */}
-            {
-                showDeleteConfirm && (
-                    <div style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: 'rgba(0,0,0,0.5)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000
-                    }}>
-                        <div style={{
-                            background: 'white',
-                            padding: '2rem',
-                            borderRadius: '8px',
-                            maxWidth: '400px',
-                            width: '90%'
-                        }}>
-                            <h3 style={{ marginBottom: '1rem', fontSize: '1.25rem' }}>Confirm Delete</h3>
-                            <p style={{ marginBottom: '1.5rem', color: '#666' }}>
-                                Are you sure you want to delete this portfolio item? This action cannot be undone.
-                            </p>
-                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                        {/* Content */}
+                        <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                            <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.1rem', fontWeight: '600' }}>{item.title}</h3>
+                            <div style={{
+                                display: 'inline-block',
+                                background: '#f5f5f5',
+                                padding: '0.25rem 0.5rem',
+                                borderRadius: '4px',
+                                fontSize: '0.75rem',
+                                color: '#666',
+                                textTransform: 'capitalize',
+                                marginBottom: '0.75rem',
+                                alignSelf: 'flex-start'
+                            }}>
+                                {item.category}
+                            </div>
+
+                            {item.tags && item.tags.length > 0 && (
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '1rem' }}>
+                                    {item.tags.slice(0, 3).map((tag, idx) => (
+                                        <span key={idx} style={{ fontSize: '0.7rem', background: '#f0f0f0', padding: '2px 6px', borderRadius: '4px', color: '#666' }}>#{tag}</span>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #eee', display: 'flex', gap: '0.5rem' }}>
                                 <button
-                                    onClick={() => setShowDeleteConfirm(null)}
+                                    onClick={() => handleToggleActive(item)}
                                     style={{
-                                        padding: '0.75rem 1.5rem',
-                                        background: '#f5f5f5',
-                                        border: '1px solid #ddd',
-                                        borderRadius: '6px',
+                                        flex: 1,
+                                        padding: '0.5rem',
+                                        background: item.isActive !== false ? '#f0fdf4' : '#fef2f2',
+                                        color: item.isActive !== false ? '#15803d' : '#dc2626',
+                                        border: 'none',
+                                        borderRadius: '4px',
                                         cursor: 'pointer',
-                                        fontWeight: '600'
+                                        fontSize: '0.75rem',
+                                        fontWeight: '600',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '0.25rem'
                                     }}
                                 >
-                                    Cancel
+                                    {item.isActive !== false ? (
+                                        <><Eye size={14} /> Hide</>
+                                    ) : (
+                                        <><EyeOff size={14} /> Show</>
+                                    )}
                                 </button>
                                 <button
-                                    onClick={handleDeleteConfirm}
+                                    onClick={() => handleEdit(item)}
                                     style={{
-                                        padding: '0.75rem 1.5rem',
-                                        background: '#dc2626',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '6px',
+                                        padding: '0.5rem',
+                                        background: 'transparent',
+                                        border: '1px solid #ddd',
+                                        borderRadius: '4px',
                                         cursor: 'pointer',
-                                        fontWeight: '600'
+                                        color: '#666'
                                     }}
+                                    title="Edit"
                                 >
-                                    Delete
+                                    <Edit2 size={16} />
+                                </button>
+                                <button
+                                    onClick={() => handleDeleteClick(item.id)}
+                                    style={{
+                                        padding: '0.5rem',
+                                        background: 'transparent',
+                                        border: '1px solid #ddd',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        color: '#dc2626'
+                                    }}
+                                    title="Delete"
+                                >
+                                    <Trash2 size={16} />
                                 </button>
                             </div>
                         </div>
                     </div>
-                )
-            }
+                ))}
+            </div>
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteConfirm && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        background: 'white',
+                        padding: '2rem',
+                        borderRadius: '8px',
+                        width: '90%',
+                        maxWidth: '400px',
+                        textAlign: 'center'
+                    }}>
+                        <h3 style={{ marginBottom: '1rem', color: '#1a1a1a' }}>Confirm Delete</h3>
+                        <p style={{ marginBottom: '1.5rem', color: '#666' }}>
+                            Are you sure you want to delete this item? This action cannot be undone.
+                        </p>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                            <button
+                                onClick={() => setShowDeleteConfirm(null)}
+                                style={{
+                                    padding: '0.75rem 1.5rem',
+                                    background: '#f5f5f5',
+                                    color: '#333',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeleteConfirm}
+                                style={{
+                                    padding: '0.75rem 1.5rem',
+                                    background: '#dc2626',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <ImportModal
                 isOpen={showImportModal}
                 onClose={() => setShowImportModal(false)}
                 onImport={handleImportData}
-                type="Portfolio"
             />
-        </div >
+        </div>
     );
 };
 

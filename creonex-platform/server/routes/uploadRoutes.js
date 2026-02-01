@@ -4,105 +4,70 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, '..', 'uploads', 'portfolio');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Configure multer for local disk storage
+// Configure local storage
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const folder = req.body.folder || 'portfolio';
-        const uploadPath = path.join(__dirname, '..', 'uploads', folder);
-
-        // Create folder if it doesn't exist
-        if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true });
+    destination: function (req, file, cb) {
+        // Create uploads directory if it doesn't exist
+        const dir = 'uploads/';
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir);
         }
-
-        cb(null, uploadPath);
+        cb(null, dir);
     },
-    filename: (req, file, cb) => {
-        // Generate unique filename
-        const timestamp = Date.now();
-        const randomStr = Math.random().toString(36).substring(2, 8);
-        const ext = path.extname(file.originalname).toLowerCase();
-        cb(null, `${timestamp}-${randomStr}${ext}`);
+    filename: function (req, file, cb) {
+        // Create unique filename
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
+
+// File filter
+const fileFilter = (req, file, cb) => {
+    // Accept images only
+    if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF|webp)$/)) {
+        req.fileValidationError = 'Only image files are allowed!';
+        return cb(new Error('Only image files are allowed!'), false);
+    }
+    cb(null, true);
+};
 
 const upload = multer({
     storage: storage,
+    fileFilter: fileFilter,
     limits: {
-        fileSize: 10 * 1024 * 1024, // 10MB limit
-    },
-    fileFilter: (req, file, cb) => {
-        // Allow image files and PDFs
-        const allowedTypes = /jpeg|jpg|png|gif|webp|pdf/;
-        const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-        const mimetype = allowedTypes.test(file.mimetype) || file.mimetype === 'application/pdf';
-
-        if (extname && mimetype) {
-            return cb(null, true);
-        }
-        cb(new Error('Only image files and PDFs are allowed'));
+        fileSize: 5 * 1024 * 1024 // 5MB max
     }
 });
 
-// Upload single image
-router.post('/image', upload.single('image'), async (req, res) => {
+// Handle image upload
+router.post('/image', upload.single('image'), (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({
                 success: false,
-                message: 'No image file provided'
+                message: 'No file uploaded or invalid file type'
             });
         }
 
-        const file = req.file;
-        const folder = req.body.folder || 'portfolio';
+        // Return the path relative to server
+        // The static middleware in server.js should serve this
+        // e.g., /uploads/filename.jpg
+        const relativePath = `/uploads/${req.file.filename}`;
 
-        // Generate the URL for the uploaded file
-        // This will be served by the static file middleware
-        const imageUrl = `/uploads/${folder}/${file.filename}`;
-
-        res.status(200).json({
+        res.json({
             success: true,
-            message: 'Image uploaded successfully',
             data: {
-                url: imageUrl,
-                filename: file.filename
+                url: relativePath,
+                filename: req.file.filename
             }
         });
-
     } catch (error) {
         console.error('Upload error:', error);
         res.status(500).json({
             success: false,
-            message: 'Image upload failed',
-            error: error.message
+            message: 'Server error during upload'
         });
     }
-});
-
-// Error handling middleware for multer
-router.use((error, req, res, next) => {
-    if (error instanceof multer.MulterError) {
-        if (error.code === 'LIMIT_FILE_SIZE') {
-            return res.status(400).json({
-                success: false,
-                message: 'File too large. Maximum size is 10MB'
-            });
-        }
-    }
-    if (error.message) {
-        return res.status(400).json({
-            success: false,
-            message: error.message
-        });
-    }
-    next(error);
 });
 
 module.exports = router;
