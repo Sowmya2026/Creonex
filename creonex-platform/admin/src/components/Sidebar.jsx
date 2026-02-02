@@ -167,6 +167,7 @@ const Sidebar = () => {
                                 to={item.path}
                                 className={`nav-link ${isActive ? 'active' : ''}`}
                                 title={isCollapsed ? item.label : undefined}
+                                onClick={() => isMobile && setIsCollapsed(true)}
                             >
                                 <Icon size={20} className="nav-icon" />
                                 {!isCollapsed && (

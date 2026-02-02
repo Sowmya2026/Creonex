@@ -739,4 +739,51 @@ body.sidebar-collapsed .main-content {
     .table-container {
         overflow-x: auto;
     }
+
+    .desktop-only {
+        display: none !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-only {
+        display: none !important;
+    }
+}
+
+/* Mobile Card Styles for Inquiries */
+.mobile-inquiry-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e5e5;
+}
+
+.mobile-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.mobile-card-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.mobile-card-label {
+    color: #666;
+    font-weight: 500;
+}
+
+.mobile-card-value {
+    text-align: right;
+    font-weight: 500;
+    color: #333;
 }

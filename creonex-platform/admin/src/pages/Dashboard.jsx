@@ -71,7 +71,7 @@ const Dashboard = () => {
                         <option>Last 3 Months</option>
                     </select>
                 </div>
-                <div style={{ height: '300px', width: '100%' }}>
+                <div style={{ height: '300px', width: '100%', minWidth: 0 }}>
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                             <defs>
