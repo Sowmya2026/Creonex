@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { ExternalLink, Link as LinkIcon, AlertCircle, Star } from 'lucide-react';
-import '../styles/LinksPage.css'; // I will create this next
+import '../styles/LinksPage.css';
+
+const getImageUrl = (url) => {
+    if (!url) return '';
+    // If it's a data URI or external URL, use as is
+    if (url.startsWith('data:') || url.startsWith('http')) return url;
+
+    // Otherwise construct absolute URL from API base
+    const baseUrl = api.defaults.baseURL || 'http://localhost:5000/api';
+    const serverRoot = baseUrl.replace(/\/api\/?$/, '');
+    return `${serverRoot}${url}`;
+};
 
 const LinksPage = () => {
     const [links, setLinks] = useState([]);
@@ -87,7 +98,7 @@ const LinksPage = () => {
                                 <div className="link-image-container">
                                     {link.imageUrl ? (
                                         <img
-                                            src={link.imageUrl.startsWith('http') ? link.imageUrl : api.getUri().replace('/api', '') + link.imageUrl}
+                                            src={getImageUrl(link.imageUrl)}
                                             alt={link.title}
                                             className="link-image"
                                             loading="lazy"
