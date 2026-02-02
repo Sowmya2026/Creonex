@@ -30,43 +30,19 @@ const ServicesPage = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check if we have cached services in sessionStorage to show immediately
-        const cachedServices = sessionStorage.getItem('creonex_services');
-        if (cachedServices) {
-            try {
-                const parsed = JSON.parse(cachedServices);
-                setServices(parsed);
-                setLoading(false); // If we have cache, don't show loading
-                // Still fetch to update in background
-                fetchServices(true);
-                return;
-            } catch (e) {
-                console.error("Cache parse error", e);
-            }
-        }
-
         fetchServices();
     }, []);
 
-    const fetchServices = async (isBackgroundUpdate = false) => {
+    const fetchServices = async () => {
         try {
-            if (!isBackgroundUpdate) setLoading(true);
+            setLoading(true);
             const response = await api.get('/services');
             const data = response.data.data || [];
-
-            // Only update state if data changed to avoid re-renders
-            setServices(prev => {
-                const isDiff = JSON.stringify(prev) !== JSON.stringify(data);
-                if (isDiff) {
-                    sessionStorage.setItem('creonex_services', JSON.stringify(data));
-                    return data;
-                }
-                return prev;
-            });
+            setServices(data);
         } catch (error) {
             console.error('Failed to fetch services:', error);
         } finally {
-            if (!isBackgroundUpdate) setLoading(false);
+            setLoading(false);
         }
     };
 
