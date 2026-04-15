@@ -21,18 +21,20 @@ const Hero = () => {
                         or fabric can be transformed into modern, Indo-western, and contemporary outfits.
                     </p>
 
-                    <div className="hero-features">
-                        <div className="feature-pill">
-                            <Sparkles className="feature-icon" size={20} strokeWidth={2.5} />
-                            <span>AI-Powered Visualization</span>
-                        </div>
-                        <div className="feature-pill">
-                            <Shirt className="feature-icon" size={20} strokeWidth={2.5} />
-                            <span>No Guesswork</span>
-                        </div>
-                        <div className="feature-pill">
-                            <Palette className="feature-icon" size={20} strokeWidth={2.5} />
-                            <span>Perfect Reference for Tailors</span>
+                    <div className="hero-features-container">
+                        <div className="hero-features">
+                            <div className="feature-item">
+                                <Sparkles className="feature-icon" size={18} strokeWidth={2.5} />
+                                <span>AI-Powered Visualization</span>
+                            </div>
+                            <div className="feature-item">
+                                <Shirt className="feature-icon" size={18} strokeWidth={2.5} />
+                                <span>No Guesswork & Transparent Process</span>
+                            </div>
+                            <div className="feature-item">
+                                <Palette className="feature-icon" size={18} strokeWidth={2.5} />
+                                <span>Perfect Reference for Tailors</span>
+                            </div>
                         </div>
                     </div>
 

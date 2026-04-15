@@ -36,19 +36,22 @@ const ContactPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setStatus('submitting');
-
+        
         try {
-            const response = await api.post('/contact', formData);
-            if (response.data.success) {
-                setStatus('success');
-                setFormData({ name: '', email: '', phone: '', company: '', message: '', subject: '' });
-                showSuccess('Message sent successfully! We\'ll get back to you soon.');
-                setTimeout(() => setStatus('idle'), 2000);
-            }
+            const waNumber = '918555074387'; // Indian format
+            const text = `*New Contact Inquiry*\n\n*Name:* ${formData.name}\n*Email:* ${formData.email || 'N/A'}\n*WhatsApp:* ${formData.phone}\n*Company:* ${formData.company || 'N/A'}\n*Subject:* ${formData.subject}\n\n*Message:*\n${formData.message}`;
+            
+            const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
+            window.open(waUrl, '_blank');
+            
+            setStatus('success');
+            setFormData({ name: '', email: '', phone: '', company: '', message: '', subject: '' });
+            showSuccess('Redirecting to WhatsApp...');
+            setTimeout(() => setStatus('idle'), 2000);
         } catch (error) {
             console.error('Contact form error:', error);
             setStatus('error');
-            showError(error.response?.data?.message || 'Failed to send message. Please try again.');
+            showError('Failed to prepare WhatsApp message. Please try again.');
             setTimeout(() => setStatus('idle'), 2000);
         }
     };

@@ -121,10 +121,7 @@ const Navbar = () => {
             {/* Mobile Menu Modal */}
             <div className={`mobile-menu-modal ${isMobileMenuOpen ? 'active' : ''}`}>
                 <div className="mobile-menu-header">
-                    <Link to="/" className="mobile-menu-logo" onClick={closeMobileMenu}>
-                        <img src={logoLight} alt="Creonex.viz Logo" className="logo-img logo-light" />
-                        <img src={logoDark} alt="Creonex.viz Logo" className="logo-img logo-dark" />
-                    </Link>
+                    <div /> {/* Spacer for centering Close button if needed, or just keep it simple */}
                     <button
                         className="mobile-menu-close"
                         onClick={closeMobileMenu}

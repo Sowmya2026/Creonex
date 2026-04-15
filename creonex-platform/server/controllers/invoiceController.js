@@ -112,6 +112,27 @@ exports.deleteInvoice = async (req, res) => {
     }
 };
 
+// Update Invoice
+exports.updateInvoice = async (req, res) => {
+    try {
+        const { date, billedTo, items, totalAmount } = req.body;
+        const updateData = {
+            date: date || new Date().toISOString(),
+            billedTo,
+            items,
+            totalAmount,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        };
+        
+        await db.collection('invoices').doc(req.params.id).update(updateData);
+        
+        res.status(200).json({ message: 'Invoice updated successfully', _id: req.params.id });
+    } catch (error) {
+        console.error('Error updating invoice:', error);
+        res.status(500).json({ message: 'Error updating invoice', error: error.message });
+    }
+};
+
 // Generate PDF - Matching uploaded format exactly
 exports.generatePDF = async (req, res) => {
     try {

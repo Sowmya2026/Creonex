@@ -11,6 +11,7 @@ import BrandPage from './pages/BrandPage';
 import OurStoryPage from './pages/OurStoryPage';
 import CatalogPage from './pages/CatalogPage';
 import LinksPage from './pages/LinksPage';
+import FloatingWhatsApp from './components/FloatingWhatsApp';
 import { useEffect } from 'react';
 import api from './services/api';
 import { Routes, Route, useLocation } from 'react-router-dom';
@@ -52,6 +53,7 @@ function App() {
         <Route path="/clients" element={<ClientPage />} />
         <Route path="/contact" element={<ContactPage />} />
       </Routes>
+      <FloatingWhatsApp />
       <Footer />
     </>
   );

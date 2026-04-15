@@ -64,8 +64,8 @@ const BrandPage = () => {
                                             onClick={() => openBooking('consultation')}
                                             className="btn btn-primary btn-lg shine-effect"
                                         >
-                                            <Calendar size={20} className="btn-icon" />
-                                            Book a Consultation
+                                            <MessageCircle size={20} className="btn-icon" />
+                                            Let's Connect
                                         </button>
                                     </div>
                                 </div>

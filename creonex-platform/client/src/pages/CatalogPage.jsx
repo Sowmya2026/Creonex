@@ -4,10 +4,30 @@ import api from '../services/api';
 import '../styles/catalog.css';
 import { FileText, ShoppingBag, X, MessageCircle, Mail } from 'lucide-react';
 
+const getImageUrl = (url) => {
+    if (!url) return '';
+    // Handle full URLs
+    if (url.startsWith('http') || url.startsWith('data:')) {
+        // Fix double URL issue if present
+        const match = url.match(/(\/uploads\/.*)/);
+        if (match) {
+            url = match[1];
+        } else {
+            return url;
+        }
+    }
+    
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const serverUrl = apiBase.replace(/\/api\/?$/, '');
+    const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+    return `${serverUrl}${cleanUrl}`;
+};
+
 const CatalogPage = () => {
     const [catalogs, setCatalogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [viewItem, setViewItem] = useState(null);
 
     useEffect(() => {
         const fetchCatalogs = async () => {
@@ -51,11 +71,12 @@ const CatalogPage = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            await api.post('/catalog-inquiries', {
-                ...formData,
-                catalogId: selectedItem.id,
-                catalogTitle: selectedItem.title
-            });
+            const waNumber = '918555074387'; // Indian format
+            const text = `*New Catalog Inquiry*\n\n*Catalog:* ${selectedItem.title}\n*Name:* ${formData.name}\n*Email:* ${formData.email || 'N/A'}\n*WhatsApp:* ${formData.phone}\n\n*Message:*\n${formData.message || 'I am interested in purchasing this catalog.'}`;
+            
+            const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
+            window.open(waUrl, '_blank');
+            
             setSubmitSuccess(true);
             setTimeout(() => {
                 setSubmitSuccess(false);
@@ -63,8 +84,8 @@ const CatalogPage = () => {
                 setFormData({ name: '', email: '', phone: '', message: '' });
             }, 3000);
         } catch (error) {
-            console.error('Failed to send inquiry', error);
-            alert('Failed to send message. Please try again.');
+            console.error('Failed to prepare WhatsApp message', error);
+            alert('Failed to prepare WhatsApp message. Please try again.');
         } finally {
             setSubmitting(false);
         }
@@ -97,10 +118,14 @@ const CatalogPage = () => {
                     <div className="catalog-grid">
                         {catalogs.map((item, index) => (
                             <ScrollReveal key={item.id} animation="fade-up" delay={index * 100}>
-                                <div className="catalog-card">
+                                <div 
+                                    className="catalog-card" 
+                                    onClick={() => setViewItem(item)}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     <div className="catalog-cover-wrapper">
                                         <img
-                                            src={api.getUri() + item.coverImageUrl}
+                                            src={getImageUrl(item.coverImageUrl)}
                                             alt={item.title}
                                             className="catalog-cover"
                                             onError={(e) => e.target.src = 'https://placehold.co/600x800?text=Catalog+Cover'}
@@ -130,7 +155,10 @@ const CatalogPage = () => {
                                             </div>
                                             <button
                                                 className="btn-buy"
-                                                onClick={() => handleBuyClick(item)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleBuyClick(item);
+                                                }}
                                             >
                                                 <ShoppingBag size={18} />
                                                 Buy Now
@@ -160,7 +188,7 @@ const CatalogPage = () => {
                         <div className="inquiry-item-preview">
                             <div className="inquiry-item-image-wrapper">
                                 <img
-                                    src={api.getUri() + selectedItem.coverImageUrl}
+                                    src={getImageUrl(selectedItem.coverImageUrl)}
                                     alt={selectedItem.title}
                                     className="inquiry-item-image"
                                     onError={(e) => e.target.src = 'https://placehold.co/600x800?text=Catalog+Cover'}
@@ -179,8 +207,8 @@ const CatalogPage = () => {
                                 <div className="success-icon">
                                     <MessageCircle size={32} />
                                 </div>
-                                <h3>Inquiry Sent!</h3>
-                                <p>We will contact you shortly with purchase details.</p>
+                                <h3>WhatsApp Link Ready!</h3>
+                                <p>You will be redirected to WhatsApp to send your inquiry.</p>
                                 <button className="btn-close-success" onClick={handleCloseModal}>
                                     Close
                                 </button>
@@ -243,6 +271,56 @@ const CatalogPage = () => {
                                 </button>
                             </form>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* View Details Modal */}
+            {viewItem && (
+                <div className="purchase-modal" onClick={() => setViewItem(null)}>
+                    <div className="purchase-modal-content" onClick={e => e.stopPropagation()}>
+                        <button className="modal-close-btn" onClick={() => setViewItem(null)}>
+                            <X size={24} />
+                        </button>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            <div style={{ backgroundColor: '#f5f5f5', borderRadius: '12px', padding: '1rem', display: 'flex', justifyContent: 'center' }}>
+                                <img
+                                    src={getImageUrl(viewItem.coverImageUrl)}
+                                    alt={viewItem.title}
+                                    style={{ width: '100%', height: 'auto', maxHeight: '50vh', objectFit: 'contain', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                                    onError={(e) => e.target.src = 'https://placehold.co/600x800?text=Catalog+Cover'}
+                                />
+                            </div>
+                            
+                            <div>
+                                <h3 style={{ fontSize: '1.75rem', marginBottom: '0.75rem', color: 'var(--primary-color)', fontWeight: '700' }}>{viewItem.title}</h3>
+                                <div style={{ display: 'flex', gap: '1.5rem', color: 'var(--text-muted)', marginBottom: '1.25rem', fontSize: '0.95rem' }}>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><FileText size={16} /> {viewItem.pageCount} Pages</span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>• PDF Format</span>
+                                </div>
+                                <p style={{ lineHeight: '1.7', color: 'var(--text-primary)', marginBottom: '2rem', fontSize: '1.05rem', whiteSpace: 'pre-wrap' }}>
+                                    {viewItem.description}
+                                </p>
+                                
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fcfcfc', padding: '1.25rem', borderRadius: '12px', border: '1px solid #ebebeb' }}>
+                                    <div style={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>
+                                        <span style={{ fontSize: '1.1rem', color: 'var(--text-muted)', marginRight: '0.25rem' }}>$</span>{viewItem.price}
+                                    </div>
+                                    <button
+                                        className="btn-buy"
+                                        style={{ padding: '0.75rem 2rem', fontSize: '1.1rem' }}
+                                        onClick={() => {
+                                            setSelectedItem(viewItem);
+                                            setViewItem(null);
+                                        }}
+                                    >
+                                        <ShoppingBag size={20} />
+                                        Buy Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

@@ -20,6 +20,13 @@
     }
 }
 
+@media (max-width: 640px) {
+    .catalog-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
 .catalog-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -102,6 +109,7 @@
     flex: 1;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     /* Reduced to 2 lines for compactness */
     -webkit-box-orient: vertical;
     overflow: hidden;
@@ -503,6 +511,7 @@
     .catalog-description {
         font-size: 0.8rem;
         -webkit-line-clamp: 2;
+        line-clamp: 2;
         /* Reduce to 2 lines on mobile */
     }
 

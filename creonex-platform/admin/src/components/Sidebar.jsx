@@ -83,10 +83,10 @@ const Sidebar = () => {
     const menuItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
         { icon: Package, label: 'Services', path: '/services' },
-        { icon: MessageSquare, label: 'Ser.Inquiries', path: '/inquiries', badge: notifications },
+        // { icon: MessageSquare, label: 'Ser.Inquiries', path: '/inquiries', badge: notifications },
         { icon: Briefcase, label: 'Brands & Collabs', path: '/brands-collabs' },
         { icon: BookOpen, label: 'Catalogs', path: '/catalogs' },
-        { icon: MessageSquare, label: 'Cat. Inquiries', path: '/catalog-inquiries' },
+        // { icon: MessageSquare, label: 'Cat. Inquiries', path: '/catalog-inquiries' },
         { icon: Image, label: 'Portfolio', path: '/portfolio' },
         { icon: LinkIcon, label: 'Affiliates', path: '/links' },
         { icon: StickyNote, label: 'Notes', path: '/notes' },

@@ -1,6 +1,6 @@
 
-import { useState, useEffect } from 'react';
-import { Plus, Trash2, Eye, Download, FileText, Code, X, Check, Copy, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Plus, Trash2, Eye, Download, FileText, Code, X, Check, Copy, ChevronLeft, ChevronRight, Edit2 } from 'lucide-react';
 import api from '../services/api';
 import '../styles/invoice.css';
 
@@ -11,6 +11,7 @@ const InvoiceGenerator = () => {
     const [jsonInput, setJsonInput] = useState('');
     const [jsonError, setJsonError] = useState('');
     const [copySuccess, setCopySuccess] = useState('');
+    const [editingInvoiceId, setEditingInvoiceId] = useState(null);
 
     // History & Stats State
     const [history, setHistory] = useState([]);
@@ -231,18 +232,46 @@ const InvoiceGenerator = () => {
 
         setLoading(true);
         try {
-            const res = await api.post('/invoices', sanitizedData);
-            alert(`Invoice Created! Number: ${res.data.invoiceNumber}`);
-            fetchHistory(); // Refresh history
-            await handleDownloadPDF(res.data._id, res.data.invoiceNumber);
+            if (editingInvoiceId) {
+                // Update existing
+                await api.put(`/invoices/${editingInvoiceId}`, sanitizedData);
+                alert(`Invoice Updated Successfully`);
+                fetchHistory(); // Refresh history
+                await handleDownloadPDF(editingInvoiceId, invoiceData.invoiceNumber);
+                setEditingInvoiceId(null);
+            } else {
+                // Create new
+                const res = await api.post('/invoices', sanitizedData);
+                alert(`Invoice Created! Number: ${res.data.invoiceNumber}`);
+                fetchHistory(); // Refresh history
+                await handleDownloadPDF(res.data._id, res.data.invoiceNumber);
+            }
         } catch (error) {
             console.error(error);
-            const msg = error.response?.data?.message || 'Failed to create invoice';
+            const msg = error.response?.data?.message || 'Failed to process invoice';
             const detail = error.response?.data?.error || '';
             alert(`${msg}\n${detail}`);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleEditInvoice = (inv) => {
+        setEditingInvoiceId(inv._id);
+        setInvoiceData({
+            invoiceNumber: inv.invoiceNumber,
+            date: inv.date ? new Date(inv.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            billedTo: {
+                name: inv.billedTo.name || '',
+                address: inv.billedTo.address || '',
+                gstin: inv.billedTo.gstin || '',
+                pan: inv.billedTo.pan || ''
+            },
+            items: inv.items.map(i => ({ ...i })), // Deep copy items
+            totalAmount: parseFloat(inv.totalAmount) || 0
+        });
+        setPreviewMode(false); // Make sure we're in edit mode
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to form
     };
 
     const handleDeleteInvoice = async (id) => {
@@ -389,6 +418,23 @@ const InvoiceGenerator = () => {
                 <div className="header-title">
                     <h1>Invoice Generator</h1>
                     <p>Create professional invoices instantly</p>
+                    {editingInvoiceId && (
+                        <span style={{ display: 'inline-block', marginTop: '0.5rem', background: '#e0e7ff', color: '#4338ca', padding: '0.25rem 0.75rem', borderRadius: '1rem', fontSize: '0.875rem', fontWeight: 600 }}>
+                            Editing Mode: {invoiceData.invoiceNumber}
+                            <button onClick={() => {
+                                setEditingInvoiceId(null);
+                                setInvoiceData({  // Reset form
+                                    invoiceNumber: 'AUTO-GENERATED', 
+                                    date: new Date().toISOString().split('T')[0],
+                                    billedTo: { name: '', address: '', gstin: '', pan: '' },
+                                    items: [{ description: '', quantity: '', rate: 0, amount: 0 }],
+                                    totalAmount: 0
+                                });
+                            }} style={{ background: 'none', border: 'none', color: '#4338ca', marginLeft: '0.5rem', cursor: 'pointer', padding: 0 }}>
+                                <X size={14} style={{ display: 'inline' }} />
+                            </button>
+                        </span>
+                    )}
                 </div>
                 <div className="header-actions">
                     <button onClick={() => setShowSampleModal(true)} className="btn-text">
@@ -411,7 +457,7 @@ const InvoiceGenerator = () => {
                     {previewMode && (
                         <button onClick={handleCreateInvoice} disabled={loading} className="btn-primary">
                             <Download size={18} />
-                            {loading ? 'Generating...' : 'Save & Download'}
+                            {loading ? (editingInvoiceId ? 'Updating...' : 'Generating...') : (editingInvoiceId ? 'Update & Download' : 'Save & Download')}
                         </button>
                     )}
                 </div>
@@ -723,6 +769,25 @@ const InvoiceGenerator = () => {
                                             >
                                                 <Download size={18} />
                                                 <span className="mobile-only-text" style={{ fontSize: '0.85rem' }}>Download</span>
+                                            </button>
+                                            <button
+                                                onClick={() => handleEditInvoice(inv)}
+                                                style={{
+                                                    padding: '0.5rem',
+                                                    background: '#fef3c7',
+                                                    color: '#d97706',
+                                                    border: 'none',
+                                                    borderRadius: '6px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '0.5rem'
+                                                }}
+                                                title="Edit Invoice"
+                                            >
+                                                <Edit2 size={18} />
+                                                <span className="mobile-only-text" style={{ fontSize: '0.85rem' }}>Edit</span>
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteInvoice(inv._id)}

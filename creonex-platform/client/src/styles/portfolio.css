@@ -2,11 +2,12 @@
 
 /* Filter Section */
 .portfolio-filter-section {
-    background: var(--card-bg, #fff);
+    background: var(--bg-card, #fff);
     border-radius: 16px;
     padding: 1.5rem 2rem;
     margin-bottom: 2rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
 }
 
 .portfolio-filter-header {
@@ -24,6 +25,15 @@
     flex-wrap: wrap;
     gap: 0.75rem;
     justify-content: center;
+    /* Allow horizontal scroll on very small screens if needed */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px; /* Room for scroll indicator */
+    scrollbar-width: none;
+}
+
+.portfolio-filter-buttons::-webkit-scrollbar {
+    display: none;
 }
 
 .portfolio-filter-btn {
@@ -156,7 +166,7 @@
 /* Portfolio Grid */
 .portfolio-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2rem;
     padding-bottom: 4rem;
 }
@@ -369,39 +379,33 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .portfolio-hero {
-        height: 220px;
-    }
-
-    .portfolio-hero-title {
-        font-size: 2rem;
-    }
-
-    .portfolio-hero-subtitle {
-        font-size: 1rem;
-        padding: 0 1rem;
-    }
-
     .portfolio-filter-section {
-        margin: -30px 1rem 1.5rem;
+        margin-bottom: 1.5rem;
         padding: 1rem 1.25rem;
     }
 
     .portfolio-filter-buttons {
         gap: 0.5rem;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+    }
+
+    .portfolio-filter-buttons::-webkit-scrollbar {
+        display: none;
     }
 
     .portfolio-filter-btn {
+        scroll-snap-align: start;
+        flex-shrink: 0;
         padding: 0.5rem 0.75rem;
         font-size: 0.8rem;
     }
 
-    .filter-icon {
-        font-size: 0.95rem;
-    }
-
     .portfolio-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 1.25rem;
         padding: 0 0 3rem;
     }
@@ -420,16 +424,8 @@
 }
 
 @media (max-width: 480px) {
-    .portfolio-hero {
-        height: 180px;
-    }
-
-    .portfolio-hero-title {
-        font-size: 1.75rem;
-    }
-
     .portfolio-filter-section {
-        margin: -20px 0.75rem 1.25rem;
+        margin: 0 0 1.25rem;
         padding: 1rem;
         border-radius: 12px;
     }
@@ -447,6 +443,15 @@
     .portfolio-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
+    }
+
+    .portfolio-card-image {
+        height: 240px;
+    }
+
+    .portfolio-results-info {
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
     }
 }
 

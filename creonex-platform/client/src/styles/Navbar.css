@@ -75,18 +75,23 @@ body.dark-theme .mobile-menu-modal {
 
 /* Close Button */
 .mobile-menu-close {
-    background: transparent;
-    border: none;
-    color: rgba(39, 25, 25, 0.6);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
     cursor: pointer;
     padding: 8px;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.2s;
+    transition: all 0.2s;
+    flex-shrink: 0;
 }
 
 .mobile-menu-close:hover {
+    background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
 }
 
@@ -177,11 +182,92 @@ body.dark-theme .mobile-menu-modal {
     font-weight: 500;
 }
 
+/* Mobile Theme Toggle Button */
+.mobile-theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-bottom: 1rem;
+}
+
+.mobile-theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+.mobile-theme-toggle .theme-icon {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.mobile-theme-toggle .sun-icon {
+    color: #f5a623;
+    opacity: 1;
+    transform: none;
+}
+
+.mobile-theme-toggle .moon-icon {
+    color: #a0b4ff;
+    opacity: 0;
+    transform: scale(0);
+    position: absolute;
+}
+
+body.dark-theme .mobile-theme-toggle .sun-icon {
+    opacity: 0;
+    transform: scale(0);
+}
+
+body.dark-theme .mobile-theme-toggle .moon-icon {
+    opacity: 1;
+    transform: scale(1);
+    position: relative;
+}
+
 /* Footer (Copyright/Signature) */
 .mobile-menu-footer {
     margin-top: auto;
+    padding-top: 1.5rem;
+}
+
+.mobile-menu-tagline {
     text-align: center;
     color: rgba(255, 255, 255, 0.3);
     font-size: 0.75rem;
-    padding-top: 2rem;
+}
+
+/* Mobile menu content area should scroll if needed */
+.mobile-menu-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.5rem 0;
+}
+
+/* Responsive adjustments for very small screens */
+@media (max-width: 480px) {
+    .mobile-menu-modal {
+        width: 85vw; /* Adaptive sizing instead of 100% */
+        border-radius: 20px 0 0 20px;
+        padding: 1.5rem 1rem;
+    }
+
+    .mobile-nav-links {
+        gap: 1rem;
+    }
+
+    .mobile-nav-text {
+        font-size: 0.95rem;
+    }
 }

@@ -103,17 +103,24 @@ const ProjectModal = ({ item, onClose }) => {
     };
 
     return (
-        <div className="project-modal-overlay" onClick={onClose}>
-            <div className="project-modal-container" onClick={e => e.stopPropagation()}>
-                <button className="project-modal-close-btn" onClick={onClose}>
+        <div className="purchase-modal" style={{ display: 'flex' }} onClick={onClose}>
+            <div className="purchase-modal-content" onClick={e => e.stopPropagation()} style={{ 
+                maxWidth: '800px', 
+                height: 'auto', 
+                maxHeight: '90vh', 
+                overflowY: 'auto',
+                borderRadius: '24px',
+                padding: '0' // Content has its own padding
+            }}>
+                <button className="modal-close-btn" onClick={onClose} style={{ top: '1.25rem', right: '1.25rem', zIndex: 100 }}>
                     <X size={24} />
                 </button>
 
-                <div className="project-modal-content">
-                    {/* Media Section (Left/Top) */}
-                    <div className="project-media-section">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '1.5rem' }}>
+                    {/* Media Section (Top) */}
+                    <div style={{ backgroundColor: '#f5f5f5', borderRadius: '16px', padding: '1rem', display: 'flex', justifyContent: 'center', width: '100%' }}>
                         {item.reelLink ? (
-                            <div className="project-video-wrapper">
+                            <div className="project-video-wrapper" style={{ width: '100%', aspectRatio: '9/16', maxHeight: '50vh', maxWidth: '350px' }}>
                                 <iframe
                                     className="instagram-embed"
                                     src={getEmbedUrl(item.reelLink)}
@@ -122,44 +129,32 @@ const ProjectModal = ({ item, onClose }) => {
                                     allowFullScreen
                                     loading="lazy"
                                     referrerPolicy="strict-origin-when-cross-origin"
-                                    style={{ border: 0 }}
+                                    style={{ border: 0, width: '100%', height: '100%', borderRadius: '12px' }}
                                 ></iframe>
                             </div>
                         ) : (
-                            <div className="project-image-slider">
+                            <div className="project-image-slider" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 {images.length > 0 ? (
-                                    <>
-                                        <div className="project-slide-container">
+                                    <div style={{ position: 'relative', width: '100%' }}>
+                                        <div className="project-slide-container" style={{ display: 'flex', justifyContent: 'center' }}>
                                             <img
                                                 src={getImageUrl(images[currentImageIndex])}
                                                 alt={`${item.title} - view ${currentImageIndex + 1}`}
-                                                className="project-slide-image"
+                                                style={{ width: '100%', height: 'auto', maxHeight: '45vh', objectFit: 'contain', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                                             />
                                         </div>
 
                                         {images.length > 1 && (
                                             <>
-                                                <button className="slider-nav prev" onClick={prevImage}>
-                                                    <ChevronLeft size={24} />
+                                                <button className="slider-nav prev" onClick={prevImage} style={{ left: '0.5rem' }}>
+                                                    <ChevronLeft size={20} />
                                                 </button>
-                                                <button className="slider-nav next" onClick={nextImage}>
-                                                    <ChevronRight size={24} />
+                                                <button className="slider-nav next" onClick={nextImage} style={{ right: '0.5rem' }}>
+                                                    <ChevronRight size={20} />
                                                 </button>
-                                                <div className="slider-dots">
-                                                    {images.map((_, idx) => (
-                                                        <span
-                                                            key={idx}
-                                                            className={`slider-dot ${idx === currentImageIndex ? 'active' : ''}`}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setCurrentImageIndex(idx);
-                                                            }}
-                                                        />
-                                                    ))}
-                                                </div>
                                             </>
                                         )}
-                                    </>
+                                    </div>
                                 ) : (
                                     <div className="no-media-placeholder">
                                         <ImageIcon size={48} />
@@ -170,53 +165,69 @@ const ProjectModal = ({ item, onClose }) => {
                         )}
                     </div>
 
-                    {/* Details Section (Right/Bottom) */}
-                    <div className="project-details-section">
-                        <div className="project-header">
-                            <div className="project-category-badge">
+                    {/* Details Section (Bottom) */}
+                    <div className="project-details-section" style={{ padding: '0.5rem', flex: 'none' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                            <div className="project-category-badge" style={{ margin: 0 }}>
                                 {getCategoryIcon(item.category)}
                                 <span>{getCategoryLabel(item.category)}</span>
                             </div>
                             {item.isFeatured && (
-                                <div className="project-featured-badge">Featured</div>
+                                <div className="project-featured-badge" style={{ margin: 0 }}>Featured</div>
                             )}
                         </div>
 
-                        <h2 className="project-title">{item.title}</h2>
+                        <h2 style={{ fontSize: '1.75rem', marginBottom: '0.75rem', color: 'var(--primary-color)', fontWeight: '700' }}>{item.title}</h2>
 
                         {item.viewsCount > 0 && item.reelLink && (
-                            <div className="project-stats">
+                            <div className="project-stats" style={{ marginBottom: '1rem' }}>
                                 <Eye size={16} />
                                 <span>{item.viewsCount.toLocaleString()} views</span>
                             </div>
                         )}
 
-                        <div className="project-description">
-                            <p>{item.description || "No description provided."}</p>
+                        <div className="project-description" style={{ marginBottom: '1.5rem' }}>
+                            <p style={{ lineHeight: '1.7', color: 'var(--text-primary)', fontSize: '1.05rem' }}>{item.description || "No description provided."}</p>
                         </div>
 
                         {item.tags && item.tags.length > 0 && (
-                            <div className="project-tags">
-                                <div className="tags-label"><Tag size={14} /> Tags:</div>
+                            <div className="project-tags" style={{ marginBottom: '2rem', padding: '1rem' }}>
+                                <div className="tags-label" style={{ marginBottom: '0.5rem' }}><Tag size={14} /> Tags:</div>
                                 <div className="tags-list">
                                     {item.tags.map((tag, idx) => (
-                                        <span key={idx} className="project-tag">{tag}</span>
+                                        <span key={idx} className="project-tag" style={{ border: '1px solid #eee' }}>{tag}</span>
                                     ))}
                                 </div>
                             </div>
                         )}
 
-                        {item.reelLink && (
-                            <a
-                                href={item.reelLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="project-external-link-btn"
+                        {/* Standardized Footer - Same as Services Page */}
+                        <div style={{ 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center', 
+                            backgroundColor: '#fcfcfc', 
+                            padding: '1.25rem', 
+                            borderRadius: '12px', 
+                            border: '1px solid #ebebeb',
+                            marginTop: 'auto'
+                        }}>
+                             <div style={{ fontSize: '1.1rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+                                Portfolio Sample
+                            </div>
+                            <button
+                                className="btn-buy"
+                                style={{ padding: '0.75rem 1.5rem', fontSize: '1rem' }}
+                                onClick={() => {
+                                    const phone = '918555074387';
+                                    const message = `Hello Creonex! I'm interested in a design similar to "${item.title}" from your portfolio. Can we discuss this?`;
+                                    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+                                    window.open(whatsappUrl, '_blank');
+                                }}
                             >
-                                <Play size={16} />
-                                {item.reelLink.includes('instagram.com') ? 'Watch on Instagram' : 'Watch Video'}
-                            </a>
-                        )}
+                                Let's Connect
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

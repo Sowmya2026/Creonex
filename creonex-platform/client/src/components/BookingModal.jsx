@@ -49,10 +49,13 @@ export default function BookingModal({ isOpen, onClose, initialType = 'consultat
         setErrorMessage('');
 
         try {
-            await api.post('/contact', {
-                ...formData,
-                subject: `New ${formData.type === 'consultation' ? 'Consultation Request' : 'Collaboration Proposal'}`
-            });
+            const waNumber = '918555074387'; // Indian format
+            const subject = formData.type === 'consultation' ? 'Consultation Request' : 'Collaboration Proposal';
+            const text = `*New ${subject}*\n\n*Name:* ${formData.name}\n*Company/Brand:* ${formData.company}\n*WhatsApp:* ${formData.phone}\n*Email:* ${formData.email || 'N/A'}\n\n*Message:*\n${formData.message}`;
+            
+            const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
+            window.open(waUrl, '_blank');
+            
             setStatus('success');
             setTimeout(() => {
                 onClose();
@@ -60,7 +63,7 @@ export default function BookingModal({ isOpen, onClose, initialType = 'consultat
         } catch (error) {
             console.error('Booking error:', error);
             setStatus('error');
-            setErrorMessage(error.response?.data?.message || 'Failed to submit. Please try again.');
+            setErrorMessage('Failed to prepare WhatsApp message. Please try again.');
         }
     };
 
@@ -87,8 +90,8 @@ export default function BookingModal({ isOpen, onClose, initialType = 'consultat
                 {status === 'success' ? (
                     <div className="modal-success">
                         <CheckCircle size={64} className="success-icon" />
-                        <h3>Request Sent!</h3>
-                        <p>We'll get back to you shortly.</p>
+                        <h3>WhatsApp Link Ready!</h3>
+                        <p>You will be redirected to WhatsApp shortly.</p>
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit} className="booking-form">

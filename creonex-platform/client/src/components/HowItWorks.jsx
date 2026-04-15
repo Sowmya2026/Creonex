@@ -34,11 +34,11 @@ const HowItWorks = () => {
                         <div className="note-items">
                             <div className="note-item">
                                 <XCircle className="note-icon note-icon-no" />
-                                <span>No stitching services</span>
+                                <span>No stitching services <small style={{ color: 'var(--accent-color)', fontWeight: '600' }}>( coming soon..! )</small></span>
                             </div>
                             <div className="note-item">
                                 <XCircle className="note-icon note-icon-no" />
-                                <span>No garment selling</span>
+                                <span>No garment selling <small style={{ color: 'var(--accent-color)', fontWeight: '600' }}>( coming soon..! )</small></span>
                             </div>
                             <div className="note-item">
                                 <CheckCircle className="note-icon note-icon-yes" />

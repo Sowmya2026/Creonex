@@ -76,7 +76,8 @@ const ClientPage = () => {
                                         onClick={() => openBooking('collaboration')}
                                         className="btn btn-outline btn-lg"
                                     >
-                                        Start Collaborating
+                                        <MessageCircle size={20} style={{ marginRight: '0.5rem' }} />
+                                        Let's Connect
                                     </button>
                                     <button
                                         onClick={() => navigate('/portfolio', { state: { filterCategory: 'collab' } })}
