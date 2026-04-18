@@ -13,13 +13,19 @@ const initializeFirebase = () => {
         if (process.env.FIREBASE_SERVICE_ACCOUNT_PATH) {
             const serviceAccountPath = path.resolve(__dirname, '..', process.env.FIREBASE_SERVICE_ACCOUNT_PATH);
             const serviceAccount = require(serviceAccountPath);
+            
+            // Ensure private key is properly formatted (common issue with environment variables)
+            if (serviceAccount.private_key && typeof serviceAccount.private_key === 'string') {
+                serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+            }
+
             firebaseApp = admin.initializeApp({
                 credential: admin.credential.cert(serviceAccount),
                 storageBucket: process.env.FIREBASE_STORAGE_BUCKET || `${serviceAccount.project_id}.appspot.com`
             });
-            console.log('✅ Firebase Admin initialized with service account file');
+            console.log(`✅ Firebase Admin initialized with service account file for project: ${serviceAccount.project_id}`);
         }
-        // Option 2: Use environment variables (easier for development)
+        // Option 2: Use environment variables (fallback)
         else if (process.env.FIREBASE_PROJECT_ID) {
             firebaseApp = admin.initializeApp({
                 credential: admin.credential.cert({
