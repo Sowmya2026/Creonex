@@ -17,6 +17,8 @@ const allowedOrigins = [
     'http://localhost:5176',
     'https://creonex.viz.vercel.app',
     'https://creonexviz-admin.vercel.app',
+    'https://creonex.vercel.app',
+    'https://creonex-admin.vercel.app',
     'https://creonex.onrender.com'
 ];
 
