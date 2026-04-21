@@ -174,15 +174,38 @@ exports.generatePDF = async (req, res) => {
             }
         };
 
+        // Helper to check and add page if needed
+        const checkPageBreak = (neededHeight) => {
+            if (y + neededHeight > 750) {
+                pdf.addPage();
+                y = 72;
+                return true;
+            }
+            return false;
+        };
+
         let y = 72;
 
         // ===== HEADER =====
         // Large INVOICE title
         pdf.font('Helvetica-Bold').fontSize(52).fillColor(PRIMARY).text('INVOICE', 72, y);
 
-        // Logo placeholder - top right
-        pdf.rect(480, y + 10, 70, 50).stroke(BORDER);
-        pdf.font('Helvetica').fontSize(10).fillColor(LIGHT).text('LOGO', 480, y + 28, { width: 70, align: 'center' });
+        // Logo Upload handling
+        if (invoice.logoUrl) {
+            try {
+                // If it's a base64 string, we handle it directly
+                if (invoice.logoUrl.startsWith('data:image')) {
+                    pdf.image(invoice.logoUrl, 460, y + 10, { width: 90 });
+                }
+            } catch (logoErr) {
+                console.error("Logo render error:", logoErr);
+                pdf.rect(480, y + 10, 70, 50).stroke(BORDER);
+                pdf.font('Helvetica').fontSize(10).fillColor(LIGHT).text('LOGO', 480, y + 28, { width: 70, align: 'center' });
+            }
+        } else {
+            pdf.rect(480, y + 10, 70, 50).stroke(BORDER);
+            pdf.font('Helvetica').fontSize(10).fillColor(LIGHT).text('LOGO', 480, y + 28, { width: 70, align: 'center' });
+        }
 
         y += 55;
 
@@ -284,10 +307,7 @@ exports.generatePDF = async (req, res) => {
             const itemHeight = Math.max(descHeight, 35);
 
             // Check if we need a new page BEFORE rendering the item
-            if (y + itemHeight > 720) {
-                pdf.addPage();
-                y = 72;
-
+            if (checkPageBreak(itemHeight)) {
                 // Repeat table header on new page
                 pdf.font('Helvetica-Bold').fontSize(10).fillColor(PRIMARY);
                 pdf.text('DESCRIPTION', 72, y);
@@ -308,7 +328,7 @@ exports.generatePDF = async (req, res) => {
             pdf.text(rate.toLocaleString('en-IN'), 390, y, { width: 70, align: 'right' });
             pdf.font('Helvetica-Bold').text(amount.toLocaleString('en-IN'), 470, y, { width: 80, align: 'right' });
             pdf.font('Helvetica');
-            y += itemHeight + 5; // Use actual height + small gap
+            y += itemHeight + 5; 
         });
 
         y += 10;
@@ -319,6 +339,8 @@ exports.generatePDF = async (req, res) => {
         y += 30;
 
         // ===== TOTAL =====
+        checkPageBreak(120); // Ensure space for total block
+
         const totalAmount = Number(invoice.totalAmount) || 0;
         pdf.font('Helvetica').fontSize(11).fillColor(LIGHT).text('Total Amount:', 350, y, { align: 'right' });
         y += 20;
@@ -354,6 +376,8 @@ exports.generatePDF = async (req, res) => {
         y += 50;
 
         // ===== FOOTER =====
+        checkPageBreak(150); // Ensure space for payment details
+
         pdf.strokeColor(BORDER).lineWidth(1).moveTo(72, y).lineTo(550, y).stroke();
         y += 30;
 

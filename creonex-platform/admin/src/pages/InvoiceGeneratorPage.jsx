@@ -98,7 +98,8 @@ const InvoiceGenerator = () => {
         items: [
             { description: '', quantity: '', rate: 0, amount: 0 }
         ],
-        totalAmount: 0
+        totalAmount: 0,
+        logoUrl: '' // Added for brand logo
     });
 
     const [previewMode, setPreviewMode] = useState(false);
@@ -209,6 +210,21 @@ const InvoiceGenerator = () => {
         }
     };
 
+    const handleLogoUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 1024 * 1024) { // 1MB limit
+                alert("File too large. Please use an image under 1MB.");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setInvoiceData(prev => ({ ...prev, logoUrl: reader.result }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleCreateInvoice = async () => {
         // Validation
         if (!invoiceData.billedTo.name || !invoiceData.billedTo.address) {
@@ -268,7 +284,8 @@ const InvoiceGenerator = () => {
                 pan: inv.billedTo.pan || ''
             },
             items: inv.items.map(i => ({ ...i })), // Deep copy items
-            totalAmount: parseFloat(inv.totalAmount) || 0
+            totalAmount: parseFloat(inv.totalAmount) || 0,
+            logoUrl: inv.logoUrl || ''
         });
         setPreviewMode(false); // Make sure we're in edit mode
         window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to form
@@ -332,9 +349,15 @@ const InvoiceGenerator = () => {
                         </div>
                     </div>
                 </div>
-                {/* Logo Placeholder */}
-                <div style={{ width: '4rem', height: '4rem', background: '#f3f4f6', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', color: '#9ca3af' }}>
-                    LOGO
+                {/* Logo Section */}
+                <div style={{ textAlign: 'right' }}>
+                    {invoiceData.logoUrl ? (
+                        <img src={invoiceData.logoUrl} alt="Logo" style={{ maxHeight: '80px', maxWidth: '180px', objectFit: 'contain' }} />
+                    ) : (
+                        <div style={{ width: '5rem', height: '5rem', background: '#f3f4f6', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', color: '#9ca3af', border: '1px dashed #d1d5db' }}>
+                            No Logo
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -544,7 +567,22 @@ const InvoiceGenerator = () => {
                 <div className="invoice-form-container">
                     {/* Billed To Section */}
                     <div className="form-section">
-                        <h2 className="section-title">Client Details (Billed To)</h2>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                            <h2 className="section-title" style={{ margin: 0 }}>Client & Brand Details</h2>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <label className="btn-secondary" style={{ cursor: 'pointer', margin: 0, padding: '0.5rem 1rem' }}>
+                                    <Edit2 size={16} />
+                                    <span>{invoiceData.logoUrl ? 'Change Logo' : 'Upload Logo'}</span>
+                                    <input type="file" hidden accept="image/*" onChange={handleLogoUpload} />
+                                </label>
+                                {invoiceData.logoUrl && (
+                                    <button onClick={() => setInvoiceData({ ...invoiceData, logoUrl: '' })} className="btn-text" style={{ color: '#ef4444' }}>
+                                        Remove Logo
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                        
                         <div className="grid-2">
                             <div className="form-column">
                                 <div className="form-group">
