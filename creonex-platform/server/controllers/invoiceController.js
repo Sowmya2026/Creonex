@@ -159,8 +159,19 @@ exports.generatePDF = async (req, res) => {
         const BORDER = '#E5E0DB';       // Light tan border
 
         const formatDate = (d) => {
-            const date = typeof d === 'string' ? new Date(d) : d;
-            return date.toLocaleDateString('en-CA'); // YYYY-MM-DD format
+            try {
+                if (!d) return 'N/A';
+                const date = typeof d === 'string' ? new Date(d) : d;
+                if (isNaN(date.getTime())) return 'N/A';
+                
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            } catch (err) {
+                console.error("Format date error:", err);
+                return 'N/A';
+            }
         };
 
         let y = 72;
@@ -211,12 +222,15 @@ exports.generatePDF = async (req, res) => {
         y -= 52; // Go back to align with FROM content
 
         // BILLED TO content
-        pdf.font('Helvetica-Bold').fontSize(14).fillColor(PRIMARY).text(invoice.billedTo.name, rightX, y, { width: 230 });
+        const billedToName = invoice.billedTo?.name || 'N/A';
+        const billedToAddress = invoice.billedTo?.address || '';
+        
+        pdf.font('Helvetica-Bold').fontSize(14).fillColor(PRIMARY).text(billedToName, rightX, y, { width: 230 });
         y += 22;
 
         // Address
         pdf.font('Helvetica').fontSize(11).fillColor(PRIMARY);
-        const addressLines = invoice.billedTo.address.split('\n');
+        const addressLines = typeof billedToAddress === 'string' ? billedToAddress.split('\n') : [];
         addressLines.forEach(line => {
             pdf.text(line, rightX, y, { width: 230 });
             y += 16;
@@ -225,13 +239,13 @@ exports.generatePDF = async (req, res) => {
         y += 10;
 
         // GSTIN and PAN
-        if (invoice.billedTo.gstin) {
+        if (invoice.billedTo?.gstin) {
             pdf.font('Helvetica-Bold').fontSize(11).fillColor(PRIMARY).text('GSTIN: ', rightX, y, { continued: true });
             pdf.font('Helvetica').text(invoice.billedTo.gstin);
             y += 18;
         }
 
-        if (invoice.billedTo.pan) {
+        if (invoice.billedTo?.pan) {
             pdf.font('Helvetica-Bold').fontSize(11).fillColor(PRIMARY).text('PAN: ', rightX, y, { continued: true });
             pdf.font('Helvetica').text(invoice.billedTo.pan);
         }
@@ -258,9 +272,15 @@ exports.generatePDF = async (req, res) => {
         // Items
         pdf.font('Helvetica').fontSize(11).fillColor(PRIMARY);
 
-        invoice.items.forEach(item => {
+        const items = Array.isArray(invoice.items) ? invoice.items : [];
+        items.forEach(item => {
+            const description = item.description || 'N/A';
+            const quantity = item.quantity || '0';
+            const rate = Number(item.rate) || 0;
+            const amount = Number(item.amount) || 0;
+
             // Calculate the height this item will need
-            const descHeight = pdf.heightOfString(item.description, { width: 240 });
+            const descHeight = pdf.heightOfString(description, { width: 240 });
             const itemHeight = Math.max(descHeight, 35);
 
             // Check if we need a new page BEFORE rendering the item
@@ -283,10 +303,10 @@ exports.generatePDF = async (req, res) => {
             }
 
             // Now render the item
-            pdf.text(item.description, 72, y, { width: 240 });
-            pdf.text(String(item.quantity), 320, y, { width: 60, align: 'center' });
-            pdf.text(item.rate.toLocaleString('en-IN'), 390, y, { width: 70, align: 'right' });
-            pdf.font('Helvetica-Bold').text(item.amount.toLocaleString('en-IN'), 470, y, { width: 80, align: 'right' });
+            pdf.text(description, 72, y, { width: 240 });
+            pdf.text(String(quantity), 320, y, { width: 60, align: 'center' });
+            pdf.text(rate.toLocaleString('en-IN'), 390, y, { width: 70, align: 'right' });
+            pdf.font('Helvetica-Bold').text(amount.toLocaleString('en-IN'), 470, y, { width: 80, align: 'right' });
             pdf.font('Helvetica');
             y += itemHeight + 5; // Use actual height + small gap
         });
@@ -299,9 +319,10 @@ exports.generatePDF = async (req, res) => {
         y += 30;
 
         // ===== TOTAL =====
+        const totalAmount = Number(invoice.totalAmount) || 0;
         pdf.font('Helvetica').fontSize(11).fillColor(LIGHT).text('Total Amount:', 350, y, { align: 'right' });
         y += 20;
-        pdf.font('Helvetica-Bold').fontSize(20).fillColor(PRIMARY).text('Rs ' + invoice.totalAmount.toLocaleString('en-IN') + ' /-', 350, y, { align: 'right' });
+        pdf.font('Helvetica-Bold').fontSize(20).fillColor(PRIMARY).text('Rs ' + totalAmount.toLocaleString('en-IN') + ' /-', 350, y, { align: 'right' });
 
         y += 35;
 
@@ -324,7 +345,7 @@ exports.generatePDF = async (req, res) => {
             return str.trim();
         };
 
-        const words = toWords(Math.round(invoice.totalAmount));
+        const words = toWords(Math.round(totalAmount));
         if (words) {
             pdf.font('Helvetica-Oblique').fontSize(10).fillColor(LIGHT)
                 .text('(Rupees ' + words + ' Only)', 72, y, { width: 478, align: 'right' });

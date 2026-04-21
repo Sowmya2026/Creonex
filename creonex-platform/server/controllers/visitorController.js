@@ -67,21 +67,45 @@ exports.getStats = async (req, res) => {
 
         // Calculate total page views
         let totalPageViews = 0;
+        
+        // Time ranges
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const activeThreshold = new Date(Date.now() - 15 * 60 * 1000);
+
+        let todayVisitors = 0;
+        let monthVisitors = 0;
+        let activeUsers = 0;
+
         visitors.forEach(visitor => {
             totalPageViews += (visitor.visits || []).length;
-        });
-
-        // Active users (last 15 mins)
-        const activeThreshold = new Date(Date.now() - 15 * 60 * 1000);
-        const activeUsers = visitors.filter(visitor => {
+            
             const lastVisit = visitor.lastVisit?.toDate ? visitor.lastVisit.toDate() : new Date(visitor.lastVisit);
-            return lastVisit >= activeThreshold;
-        }).length;
+            const firstVisit = visitor.firstVisit?.toDate ? visitor.firstVisit.toDate() : new Date(visitor.firstVisit);
+
+            // Active users
+            if (lastVisit >= activeThreshold) {
+                activeUsers++;
+            }
+
+            // Today's visitors (using lastVisit to see if they were active today)
+            if (lastVisit >= startOfToday) {
+                todayVisitors++;
+            }
+
+            // This month's visitors
+            if (lastVisit >= startOfMonth) {
+                monthVisitors++;
+            }
+        });
 
         res.status(200).json({
             totalVisitors,
             totalPageViews,
-            activeUsers
+            activeUsers,
+            todayVisitors,
+            monthVisitors
         });
     } catch (error) {
         console.error('Stats Error:', error);

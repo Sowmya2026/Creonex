@@ -290,13 +290,22 @@ const InvoiceGenerator = () => {
     const handleDownloadPDF = async (id, number) => {
         try {
             const response = await api.get(`/invoices/${id}/pdf`, { responseType: 'blob' });
-            const url = window.URL.createObjectURL(new Blob([response.data]));
+            
+            // Create Blob with specific type
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            
             const link = document.createElement('a');
             link.href = url;
             link.setAttribute('download', `${number}.pdf`);
             document.body.appendChild(link);
             link.click();
-            link.remove();
+            
+            // Cleanup
+            setTimeout(() => {
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            }, 100);
         } catch (error) {
             console.error('PDF Download failed', error);
             alert('Could not download PDF');
