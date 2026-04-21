@@ -43,6 +43,23 @@ export const AuthProvider = ({ children }) => {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const token = await userCredential.user.getIdToken();
 
+            // Ensure user document exists in Firestore
+            const userRef = doc(db, 'users', userCredential.user.uid);
+            const userDoc = await getDoc(userRef);
+
+            if (!userDoc.exists()) {
+                await setDoc(userRef, {
+                    email: userCredential.user.email,
+                    role: 'admin',
+                    createdAt: new Date(),
+                    lastLogin: new Date()
+                });
+            } else {
+                await setDoc(userRef, {
+                    lastLogin: new Date()
+                }, { merge: true });
+            }
+
             return {
                 success: true,
                 user: {

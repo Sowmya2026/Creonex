@@ -11,29 +11,33 @@ console.log('Admin API Base URL:', api.defaults.baseURL);
 
 // Resolves once Firebase has initialized and determined the auth state (logged in or not).
 // This prevents the race condition where requests fire before auth.currentUser is populated.
-let authReadyPromise = null;
-const waitForAuthReady = () => {
-    if (!authReadyPromise) {
-        authReadyPromise = new Promise((resolve) => {
-            const unsubscribe = onAuthStateChanged(auth, (user) => {
-                unsubscribe(); // Only need to listen once
-                resolve(user);
-            });
-        });
-    }
-    return authReadyPromise;
-};
-
 // Add request interceptor to attach Firebase auth token
 api.interceptors.request.use(
     async (config) => {
-        // Wait for Firebase auth to be ready before checking currentUser
-        await waitForAuthReady();
-        const user = auth.currentUser;
-        if (user) {
-            const token = await user.getIdToken();
-            config.headers.Authorization = `Bearer ${token}`;
+        let user = auth.currentUser;
+        
+        // If user is null, Firebase might still be initializing. 
+        // Wait for the first state change to be sure.
+        if (!user) {
+            user = await new Promise((resolve) => {
+                const unsubscribe = onAuthStateChanged(auth, (u) => {
+                    unsubscribe();
+                    resolve(u);
+                });
+            });
         }
+
+        if (user) {
+            try {
+                const token = await user.getIdToken();
+                config.headers.Authorization = `Bearer ${token}`;
+            } catch (tokenError) {
+                console.error('Failed to get auth token:', tokenError);
+            }
+        } else {
+            console.warn('API request sent without authentication token (user is null)');
+        }
+        
         return config;
     },
     (error) => {
