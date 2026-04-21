@@ -35,9 +35,10 @@ const BrandsCollabsPage = () => {
     useEffect(() => {
         const initializeInquiries = async () => {
             try {
-                // Mark all as read FIRST when page is visited
-                await api.patch('/contact/read-all');
+                // Fetch inquiries FIRST
                 await fetchInquiries();
+                // Then mark as read in the background (don't block the UI)
+                api.patch('/contact/read-all').catch(err => console.warn("Failed to mark all as read:", err));
             } catch (error) {
                 console.error("Failed to fetch brand inquiries", error);
                 setLoading(false);

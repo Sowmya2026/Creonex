@@ -48,19 +48,28 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
+        const { config, response } = error;
+
+        // Auto-retry on timeouts (Cold Start handling)
+        if ((error.code === 'ECONNABORTED' || error.message?.includes('timeout')) && !config._retry) {
+            config._retryCount = (config._retryCount || 0) + 1;
+            
+            if (config._retryCount <= 2) {
+                console.log(`🔄 Retrying request (${config._retryCount}/2): ${config.url}`);
+                // Wait 2s before retry to give server more boot time
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                return api(config);
+            }
+        }
+
         // Handle 401 Unauthorized errors
-        if (error.response?.status === 401) {
+        if (response?.status === 401) {
             console.warn('API returned 401 Unauthorized');
             
-            // If a user is currently logged in but received a 401, 
-            // it means their token is invalid or they lack permissions.
-            // We sign out to trigger the app's redirection logic safely.
             if (auth.currentUser) {
                 try {
                     console.error('Active session rejected by server. Signing out...');
                     await signOut(auth);
-                    // No need for window.location.href - AuthContext will detect the 
-                    // sign out and RequireAuth will redirect to /login.
                 } catch (logoutError) {
                     console.error('Logout failed:', logoutError);
                     window.location.href = '/login'; // Fallback
@@ -70,7 +79,7 @@ api.interceptors.response.use(
         
         // Detailed error logging for production debugging
         if (error.code === 'ECONNABORTED') {
-            console.error('Request timed out. The server might be starting up.');
+            console.error('Request timed out after second retry. The server is still starting up or under heavy load.');
         }
 
         return Promise.reject(error);

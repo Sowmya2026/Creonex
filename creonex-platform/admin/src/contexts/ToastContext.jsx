@@ -15,7 +15,8 @@ export const ToastProvider = ({ children }) => {
     const [toasts, setToasts] = useState([]);
 
     const addToast = (message, type = 'info', duration = 4000) => {
-        const id = Date.now();
+        // Use random UUID for unique keys, fallback to timestamp + counter
+        const id = typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
         setToasts((prev) => [...prev, { id, message, type, duration }]);
     };
 
