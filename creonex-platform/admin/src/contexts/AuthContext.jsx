@@ -43,21 +43,26 @@ export const AuthProvider = ({ children }) => {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const token = await userCredential.user.getIdToken();
 
-            // Ensure user document exists in Firestore
-            const userRef = doc(db, 'users', userCredential.user.uid);
-            const userDoc = await getDoc(userRef);
+            // Try to ensure user document exists in Firestore
+            try {
+                const userRef = doc(db, 'users', userCredential.user.uid);
+                const userDoc = await getDoc(userRef);
 
-            if (!userDoc.exists()) {
-                await setDoc(userRef, {
-                    email: userCredential.user.email,
-                    role: 'admin',
-                    createdAt: new Date(),
-                    lastLogin: new Date()
-                });
-            } else {
-                await setDoc(userRef, {
-                    lastLogin: new Date()
-                }, { merge: true });
+                if (!userDoc.exists()) {
+                    await setDoc(userRef, {
+                        email: userCredential.user.email,
+                        role: 'admin',
+                        createdAt: new Date(),
+                        lastLogin: new Date()
+                    });
+                } else {
+                    await setDoc(userRef, {
+                        lastLogin: new Date()
+                    }, { merge: true });
+                }
+            } catch (fsError) {
+                console.warn('Firestore user doc sync failed (likely permission rules):', fsError.message);
+                // We still proceed because the Auth itself succeeded
             }
 
             return {
