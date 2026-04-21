@@ -8,8 +8,15 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { login, loginWithGoogle } = useAuth();
+    const { user, login, loginWithGoogle } = useAuth();
     const navigate = useNavigate();
+
+    // Redirect to home if already logged in
+    useEffect(() => {
+        if (user) {
+            navigate('/');
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

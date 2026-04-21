@@ -16,26 +16,35 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Listen for auth state changes
-        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-            if (firebaseUser) {
-                // Get the ID token
-                const token = await firebaseUser.getIdToken();
-
-                setUser({
-                    uid: firebaseUser.uid,
-                    email: firebaseUser.email,
-                    displayName: firebaseUser.displayName,
-                    photoURL: firebaseUser.photoURL,
-                    token
-                });
-            } else {
-                setUser(null);
+        // Wait for Firebase to determine if there's a cached session
+        const init = async () => {
+            if (auth.authStateReady) {
+                await auth.authStateReady();
             }
-            setLoading(false);
-        });
+            
+            const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+                if (firebaseUser) {
+                    const token = await firebaseUser.getIdToken();
+                    setUser({
+                        uid: firebaseUser.uid,
+                        email: firebaseUser.email,
+                        displayName: firebaseUser.displayName,
+                        photoURL: firebaseUser.photoURL,
+                        token
+                    });
+                } else {
+                    setUser(null);
+                }
+                setLoading(false);
+            });
+            
+            return unsubscribe;
+        };
 
-        return () => unsubscribe();
+        const unsubscribePromise = init();
+        return () => {
+            unsubscribePromise.then(unsub => unsub());
+        };
     }, []);
 
     const login = async (email, password) => {

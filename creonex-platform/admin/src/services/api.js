@@ -1,62 +1,73 @@
 import axios from 'axios';
 import { auth } from '../config/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 
-// Create axios instance with base URL
+// ----------------------------------------------------------------------
+// API Service for Admin Portal
+// Features: 
+// 1. Automatic Firebase ID Token attachment
+// 2. Auth-state synchronization (avoids race conditions)
+// 3. Graceful session expiration handling
+// ----------------------------------------------------------------------
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+    timeout: 30000 // 30s timeout for stability on slow backend (Render spin-up)
 });
 
-console.log('Admin API Base URL:', api.defaults.baseURL);
-
-// Resolves once Firebase has initialized and determined the auth state (logged in or not).
-// This prevents the race condition where requests fire before auth.currentUser is populated.
-// Add request interceptor to attach Firebase auth token
+// Request interceptor to attach Bearer token
 api.interceptors.request.use(
     async (config) => {
-        let user = auth.currentUser;
-        
-        // If user is null, Firebase might still be initializing. 
-        // Wait for the first state change to be sure.
-        if (!user) {
-            user = await new Promise((resolve) => {
-                const unsubscribe = onAuthStateChanged(auth, (u) => {
-                    unsubscribe();
-                    resolve(u);
-                });
-            });
-        }
-
-        if (user) {
-            try {
-                const token = await user.getIdToken();
-                config.headers.Authorization = `Bearer ${token}`;
-            } catch (tokenError) {
-                console.error('Failed to get auth token:', tokenError);
+        try {
+            // Wait for Firebase to finish the initial session restoration
+            // This is the most reliable way to avoid the "null user" on page load.
+            if (typeof auth.authStateReady === 'function') {
+                await auth.authStateReady();
             }
-        } else {
-            console.warn('API request sent without authentication token (user is null)');
+
+            const user = auth.currentUser;
+            if (user) {
+                // Force fresh token to ensure it's not expired
+                const token = await user.getIdToken(false);
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+        } catch (error) {
+            console.error('API Request Auth Error:', error);
         }
-        
         return config;
     },
-    (error) => {
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
 );
 
-// Add response interceptor for error handling
+// Response interceptor for error handling
 api.interceptors.response.use(
     (response) => response,
-    (error) => {
+    async (error) => {
+        // Handle 401 Unauthorized errors
         if (error.response?.status === 401) {
-            // Only redirect to login if the user WAS logged in (token genuinely expired/invalid).
-            // If auth.currentUser is null, Firebase hasn't restored the session yet —
-            // do NOT redirect or it causes an instant logout loop on page load.
+            console.warn('API returned 401 Unauthorized');
+            
+            // If a user is currently logged in but received a 401, 
+            // it means their token is invalid or they lack permissions.
+            // We sign out to trigger the app's redirection logic safely.
             if (auth.currentUser) {
-                window.location.href = '/login';
+                try {
+                    console.error('Active session rejected by server. Signing out...');
+                    await signOut(auth);
+                    // No need for window.location.href - AuthContext will detect the 
+                    // sign out and RequireAuth will redirect to /login.
+                } catch (logoutError) {
+                    console.error('Logout failed:', logoutError);
+                    window.location.href = '/login'; // Fallback
+                }
             }
         }
+        
+        // Detailed error logging for production debugging
+        if (error.code === 'ECONNABORTED') {
+            console.error('Request timed out. The server might be starting up.');
+        }
+
         return Promise.reject(error);
     }
 );
