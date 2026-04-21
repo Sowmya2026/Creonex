@@ -12,22 +12,27 @@ import { signOut } from 'firebase/auth';
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-    timeout: 30000 // 30s timeout for stability on slow backend (Render spin-up)
+    timeout: 60000 // 60s timeout - essential for Render.com free tier cold starts
 });
 
 // Request interceptor to attach Bearer token
 api.interceptors.request.use(
     async (config) => {
         try {
-            // Wait for Firebase to finish the initial session restoration
-            // This is the most reliable way to avoid the "null user" on page load.
-            if (typeof auth.authStateReady === 'function') {
-                await auth.authStateReady();
+            // Only block if Firebase is still in the "initializing" phase.
+            // If currentUser is already set, or authStateReady has already resolved, 
+            // we proceed immediately.
+            if (!auth.currentUser && typeof auth.authStateReady === 'function') {
+                // Wait for initial session restoration (max 5s wait for auth specifically)
+                await Promise.race([
+                    auth.authStateReady(),
+                    new Promise(resolve => setTimeout(resolve, 5000))
+                ]);
             }
 
             const user = auth.currentUser;
             if (user) {
-                // Force fresh token to ensure it's not expired
+                // Use cached token if available, fresh if needed
                 const token = await user.getIdToken(false);
                 config.headers.Authorization = `Bearer ${token}`;
             }
