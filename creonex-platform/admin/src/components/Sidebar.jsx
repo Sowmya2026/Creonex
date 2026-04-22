@@ -55,7 +55,7 @@ const Sidebar = () => {
         fetchUnreadCount();
         const intervalId = setInterval(fetchUnreadCount, 60000);
         return () => clearInterval(intervalId);
-    }, [location.pathname]);
+    }, []); // Removed location.pathname to prevent redundant fetches-on-navigation
 
     // Handle resize
     useEffect(() => {

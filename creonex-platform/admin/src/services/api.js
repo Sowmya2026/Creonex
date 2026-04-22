@@ -12,18 +12,33 @@ import { signOut } from 'firebase/auth';
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-    timeout: 60000 // 60s timeout - essential for Render.com free tier cold starts
+    timeout: 60000 
 });
 
-// Request interceptor to attach Bearer token
+// Cache for in-flight requests (Request Deduping)
+const pendingRequests = new Map();
+
+// Request interceptor
 api.interceptors.request.use(
     async (config) => {
+        // Create unique key for the request (Method + URL + Params)
+        const requestKey = `${config.method}:${config.url}:${JSON.stringify(config.params || {})}`;
+        
+        // If an identical request is already in progress, wait for it
+        if (pendingRequests.has(requestKey) && config.method?.toLowerCase() === 'get') {
+            return pendingRequests.get(requestKey).then(response => {
+                // Return a "fake" successful promise that looks like a real Axios response
+                // but actually comes from the existing in-flight request.
+                // Note: Axios interceptors expect the config to be returned if we want to proceed,
+                // but here we actually want to BLOCK the second request and return the first one's result.
+                // Since Axios doesn't support returning a response directly from a request interceptor,
+                // we'll handle this by attaching a special property.
+                config.adapter = () => pendingRequests.get(requestKey);
+            });
+        }
+
         try {
-            // Only block if Firebase is still in the "initializing" phase.
-            // If currentUser is already set, or authStateReady has already resolved, 
-            // we proceed immediately.
             if (!auth.currentUser && typeof auth.authStateReady === 'function') {
-                // Wait for initial session restoration (max 5s wait for auth specifically)
                 await Promise.race([
                     auth.authStateReady(),
                     new Promise(resolve => setTimeout(resolve, 5000))
@@ -32,54 +47,53 @@ api.interceptors.request.use(
 
             const user = auth.currentUser;
             if (user) {
-                // Use cached token if available, fresh if needed
-                const token = await user.getIdToken(false);
+                const token = await Promise.race([
+                    user.getIdToken(false),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Token timeout')), 10000))
+                ]);
                 config.headers.Authorization = `Bearer ${token}`;
             }
         } catch (error) {
-            console.error('API Request Auth Error:', error);
+            console.error('API Request Auth/Token Error:', error);
         }
         return config;
     },
     (error) => Promise.reject(error)
 );
 
-// Response interceptor for error handling
+// Response interceptor
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        const requestKey = `${response.config.method}:${response.config.url}:${JSON.stringify(response.config.params || {})}`;
+        pendingRequests.delete(requestKey);
+        return response;
+    },
     async (error) => {
         const { config, response } = error;
+        const requestKey = config ? `${config.method}:${config.url}:${JSON.stringify(config.params || {})}` : null;
+        if (requestKey) pendingRequests.delete(requestKey);
 
-        // Auto-retry on timeouts (Cold Start handling)
-        if ((error.code === 'ECONNABORTED' || error.message?.includes('timeout')) && !config._retry) {
+        const isNetworkError = !response && error.code !== 'ECONNABORTED';
+        const isTimeout = error.code === 'ECONNABORTED' || error.message?.includes('timeout');
+
+        if ((isNetworkError || isTimeout) && (!config || !config._retry)) {
             config._retryCount = (config._retryCount || 0) + 1;
             
             if (config._retryCount <= 2) {
-                console.log(`🔄 Retrying request (${config._retryCount}/2): ${config.url}`);
-                // Wait 2s before retry to give server more boot time
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                console.log(`🔄 Retrying due to ${isTimeout ? 'timeout' : 'network error'} (${config._retryCount}/2): ${config.url}`);
+                const delay = config._retryCount === 1 ? 1000 : 3000;
+                await new Promise(resolve => setTimeout(resolve, delay));
                 return api(config);
             }
         }
 
-        // Handle 401 Unauthorized errors
-        if (response?.status === 401) {
-            console.warn('API returned 401 Unauthorized');
-            
-            if (auth.currentUser) {
-                try {
-                    console.error('Active session rejected by server. Signing out...');
-                    await signOut(auth);
-                } catch (logoutError) {
-                    console.error('Logout failed:', logoutError);
-                    window.location.href = '/login'; // Fallback
-                }
+        if (response?.status === 401 && auth.currentUser) {
+            try {
+                console.error('Active session rejected by server. Signing out...');
+                await signOut(auth);
+            } catch (logoutError) {
+                window.location.href = '/login'; 
             }
-        }
-        
-        // Detailed error logging for production debugging
-        if (error.code === 'ECONNABORTED') {
-            console.error('Request timed out after second retry. The server is still starting up or under heavy load.');
         }
 
         return Promise.reject(error);
