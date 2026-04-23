@@ -53,9 +53,9 @@ const AnalyticsPage = () => {
                         <div className="chart-header">
                             <h3 className="chart-title">Traffic Overview (Last 7 Days)</h3>
                         </div>
-                        <div style={{ height: '350px', width: '100%' }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                        <div style={{ height: '350px', width: '100%', minWidth: 0 }}>
+                            <ResponsiveContainer width="100%" height="100%" debounce={100}>
+                                <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">
                                             <stop offset="5%" stopColor="#8B6F47" stopOpacity={0.8} />

@@ -407,6 +407,11 @@ body.sidebar-collapsed .main-content {
     flex: 1;
 }
 
+.page-padding {
+    padding: 1.5rem;
+    width: 100%;
+}
+
 /* ==============================================
    STATS & CARDS
    ============================================== */
@@ -481,6 +486,8 @@ body.sidebar-collapsed .main-content {
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     margin-bottom: 2rem;
+    min-width: 0;
+    width: 100%;
 }
 
 .chart-header {

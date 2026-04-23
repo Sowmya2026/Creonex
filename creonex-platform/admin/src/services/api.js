@@ -51,7 +51,9 @@ api.interceptors.request.use(
                     user.getIdToken(false),
                     new Promise((_, reject) => setTimeout(() => reject(new Error('Token timeout')), 10000))
                 ]);
-                config.headers.Authorization = `Bearer ${token}`;
+                if (token) {
+                    config.headers.Authorization = `Bearer ${token}`;
+                }
             }
         } catch (error) {
             console.error('API Request Auth/Token Error:', error);
@@ -87,12 +89,18 @@ api.interceptors.response.use(
             }
         }
 
-        if (response?.status === 401 && auth.currentUser) {
+        if (response?.status === 401 && auth.currentUser && !config._retryAuth) {
+            config._retryAuth = true;
             try {
-                console.error('Active session rejected by server. Signing out...');
+                // Force refresh the Firebase token
+                console.log('🔄 Token likely expired, refreshing session...');
+                const token = await auth.currentUser.getIdToken(true);
+                config.headers.Authorization = `Bearer ${token}`;
+                return api(config); // Retry original request with new token
+            } catch (refreshError) {
+                console.error('❌ Session refresh failed. Signing out...', refreshError);
                 await signOut(auth);
-            } catch (logoutError) {
-                window.location.href = '/login'; 
+                window.location.href = '/login';
             }
         }
 

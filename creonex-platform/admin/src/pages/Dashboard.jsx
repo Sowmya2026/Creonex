@@ -71,8 +71,8 @@ const Dashboard = () => {
                         <option>Last 3 Months</option>
                     </select>
                 </div>
-                <div style={{ height: 350, width: '100%', minHeight: 300 }}>
-                    <ResponsiveContainer width="100%" height="100%">
+                <div style={{ height: '350px', width: '100%', minWidth: 0 }}>
+                    <ResponsiveContainer width="100%" height="100%" debounce={100}>
                         <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">
